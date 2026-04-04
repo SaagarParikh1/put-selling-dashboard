@@ -64,11 +64,15 @@ def _normalize_history(df: pd.DataFrame, symbol: str) -> pd.DataFrame:
     return df
 
 
-def _download_history(symbol: str) -> pd.DataFrame:
+def _download_history(
+    symbol: str,
+    period: str = FIXED_PERIOD,
+    interval: str = FIXED_INTERVAL,
+) -> pd.DataFrame:
     df = yf.download(
         tickers=symbol,
-        period=FIXED_PERIOD,
-        interval=FIXED_INTERVAL,
+        period=period,
+        interval=interval,
         auto_adjust=False,
         progress=False,
         threads=False,
@@ -79,8 +83,8 @@ def _download_history(symbol: str) -> pd.DataFrame:
     if df is None or df.empty:
         ticker = yf.Ticker(symbol)
         df = ticker.history(
-            period=FIXED_PERIOD,
-            interval=FIXED_INTERVAL,
+            period=period,
+            interval=interval,
             auto_adjust=False,
             prepost=False,
         )
@@ -88,11 +92,20 @@ def _download_history(symbol: str) -> pd.DataFrame:
     return _normalize_history(df, symbol)
 
 
-def fetch_benchmark_data(symbol: str = BENCHMARK_SYMBOL) -> pd.DataFrame:
-    return _download_history(symbol)
+def fetch_benchmark_data(
+    symbol: str = BENCHMARK_SYMBOL,
+    period: str = FIXED_PERIOD,
+    interval: str = FIXED_INTERVAL,
+) -> pd.DataFrame:
+    return _download_history(symbol, period=period, interval=interval)
 
 
-def fetch_stock_data(symbol: str, include_benchmark: bool = False):
+def fetch_stock_data(
+    symbol: str,
+    include_benchmark: bool = False,
+    period: str = FIXED_PERIOD,
+    interval: str = FIXED_INTERVAL,
+):
     """
     Default behavior remains backward-compatible:
     - fetch_stock_data("AAPL") -> DataFrame
@@ -104,7 +117,7 @@ def fetch_stock_data(symbol: str, include_benchmark: bool = False):
             "benchmark_df": ...,
          }
     """
-    stock_df = _download_history(symbol)
+    stock_df = _download_history(symbol, period=period, interval=interval)
 
     if not include_benchmark:
         return stock_df
@@ -112,7 +125,7 @@ def fetch_stock_data(symbol: str, include_benchmark: bool = False):
     benchmark_df = None
     if include_benchmark:
         try:
-            benchmark_df = fetch_benchmark_data()
+            benchmark_df = fetch_benchmark_data(period=period, interval=interval)
         except Exception:
             benchmark_df = None
 

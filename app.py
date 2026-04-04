@@ -5,6 +5,12 @@ import pandas as pd
 import plotly.graph_objects as go
 
 from src.analysis import analyze_stock, summarize_stock
+from src.backtesting import (
+    learning_signature,
+    load_backtest_summary,
+    load_learning_profile,
+    run_automatic_learning_cycle,
+)
 from src.utils import (
     build_action_suggestion,
     build_avoid_reason,
@@ -627,11 +633,22 @@ def label_color(label: str) -> str:
     colors = {
         "High Probability Put Sell": "#22c55e",
         "Put Sell Candidate": "#84cc16",
+        "Stalk / Watchlist": "#60a5fa",
         "Neutral / Wait": "#facc15",
         "Downtrend Risk": "#fb923c",
         "Breakdown Risk": "#ef4444",
     }
     return colors.get(label, "#cbd5e1")
+
+
+LABEL_PRIORITY = {
+    "High Probability Put Sell": 0,
+    "Put Sell Candidate": 1,
+    "Stalk / Watchlist": 2,
+    "Neutral / Wait": 3,
+    "Downtrend Risk": 4,
+    "Breakdown Risk": 5,
+}
 
 
 def entry_status_color(status: str) -> str:
@@ -757,6 +774,19 @@ DISPLAY_COLUMN_LABELS = {
 }
 
 
+def sort_signal_df(df: pd.DataFrame, ascending_score: bool = False) -> pd.DataFrame:
+    if df.empty or "label" not in df.columns:
+        return df
+
+    sorted_df = df.copy()
+    sorted_df["_label_priority"] = sorted_df["label"].map(LABEL_PRIORITY).fillna(99)
+    sorted_df = sorted_df.sort_values(
+        ["_label_priority", "score", "confidence"],
+        ascending=[True, ascending_score, ascending_score],
+    )
+    return sorted_df.drop(columns="_label_priority")
+
+
 def prepare_display_table(df: pd.DataFrame, columns: list[str]) -> pd.DataFrame:
     available_cols = [col for col in columns if col in df.columns]
     return df[available_cols].rename(columns=DISPLAY_COLUMN_LABELS)
@@ -777,7 +807,8 @@ def render_guide_content() -> None:
                 The dashboard is now built around a seasoned put-seller idea:
                 <b>good underlying I would not mind owning, near support, with risk still under control.</b><br><br>
                 <b>High Probability Put Sell</b> means the stock, the support area, the bounce behavior, and the downside profile all line up unusually well.<br><br>
-                <b>Put Sell Candidate</b> means the stock looks acceptable for assignment and is worth stalking, but the timing is not quite as clean or confirmed yet.<br><br>
+                <b>Put Sell Candidate</b> means the stock is near enough to support to be a legitimate put-selling idea, but it is still a notch below the cleanest trade-ready setups.<br><br>
+                <b>Stalk / Watchlist</b> means the stock may be worth owning if assigned, but the timing is not ready enough yet for a disciplined put sale.<br><br>
                 <b>Neutral / Wait</b> means there may be something to like, but the timing or risk profile is not ready yet.<br><br>
                 <b>Downtrend Risk</b> and <b>Breakdown Risk</b> mean put sellers should get more defensive because support is less dependable.
             </div>
@@ -801,10 +832,12 @@ def render_guide_content() -> None:
             """
             <div class='guide-block-copy'>
                 A typical <b>Put Sell Candidate</b> needs enough quality to justify assignment, a reasonable support map, and risk that is not already deteriorating.
-                It does <b>not</b> need a perfect entry today.
-                In practice, better candidates usually have <b>Quality around 5+</b>, <b>Entry around -1 or better</b>, <b>Risk around -4 or better</b>, and price that is still behaving constructively around support.
+                It does <b>not</b> need a perfect entry today, but it should already be near a real support decision area.
+                In practice, better candidates usually have <b>Quality around 5+</b>, <b>Entry around 0 or better</b>, <b>Risk around -4 or better</b>, and price that is already testing or reclaiming support in a constructive way.
                 <br><br>
-                <b>High Probability Put Sell</b> is stricter. It usually needs stronger quality, a support-based entry that is already firming up, and fewer obvious risk flags or cautionary breakdown signals.
+                <b>Stalk / Watchlist</b> is for names that may still be acceptable to own on assignment, but are too early, too extended above support, or still waiting on bounce confirmation.
+                <br><br>
+                <b>High Probability Put Sell</b> is stricter. It usually needs stronger quality, a support-based entry that is already firming up, and a clearer bounce or stabilization signal with fewer obvious risk flags.
             </div>
             """,
         ),
@@ -834,6 +867,16 @@ def render_guide_content() -> None:
             </div>
             """,
         ),
+        (
+            "Auto Backtest And Learning",
+            """
+            <div class='guide-block-copy'>
+                On each full analysis cycle, the dashboard can replay historical signals across the watchlist, evaluate how those setups behaved afterward, and save a small local learning profile.
+                <br><br>
+                This is <b>not</b> full machine-learning retraining. It is a rule-tuning loop that adjusts scoring thresholds modestly based on recent historical hit rate, drawdown behavior, support-hold performance, and whether trade-ready setups actually stabilized enough for a put seller.
+            </div>
+            """,
+        ),
     ]
 
     for title, body in blocks:
@@ -842,6 +885,120 @@ def render_guide_content() -> None:
             <div class='guide-panel'>
                 <div class='guide-block-title'>{title}</div>
                 {body}
+            </div>
+            """,
+            unsafe_allow_html=True,
+        )
+
+
+def render_auto_backtest_summary(backtest_summary: dict | None, learning_profile: dict | None) -> None:
+    render_section_header(
+        "Auto Backtest And Learning",
+        "The dashboard replays historical signals, scores how they behaved afterward, and uses that summary to self-tune the rules over time.",
+        "Research",
+    )
+
+    if not backtest_summary:
+        st.info("No automatic backtest summary is available yet. Run analysis to generate one.")
+        return
+
+    generated_at = backtest_summary.get("generated_at")
+    refreshed_text = "Unavailable"
+    if generated_at:
+        try:
+            refreshed_text = pd.to_datetime(generated_at).strftime("%b %d, %Y %I:%M %p UTC")
+        except Exception:
+            refreshed_text = str(generated_at)
+
+    candidate_like = backtest_summary.get("candidate_like") or {}
+    method_notes = (backtest_summary.get("methodology") or {}).get("notes") or []
+    learning_notes = (learning_profile or {}).get("notes") or []
+    source_summary = (learning_profile or {}).get("source_summary") or {}
+
+    st.markdown(
+        f"""
+        <div class='section-card'>
+            <div style='display:flex; justify-content:space-between; gap:1rem; flex-wrap:wrap; align-items:flex-start;'>
+                <div>
+                    <div class='section-eyebrow'>Automatic Loop</div>
+                    <div style='color:#e5edf7; font-size:1rem; font-weight:800; margin-bottom:0.2rem;'>Backtest refreshed: {refreshed_text}</div>
+                    <div style='color:#9fb0c8; line-height:1.6;'>
+                        This learning loop uses an <b>underlying-behavior proxy</b>, not actual option premium P/L. It checks whether historical signals held support and avoided materially weak forward price behavior.
+                        The trade-ready labels are judged more strictly than a simple "did the stock go up?" test.
+                    </div>
+                </div>
+                <div style='display:flex; flex-wrap:wrap; gap:0.45rem;'>
+                    <span class='summary-chip'>History Window: {(backtest_summary.get("methodology") or {}).get("history_period", "N/A")}</span>
+                    <span class='summary-chip'>Signals Tested: {candidate_like.get("signal_count", 0)}</span>
+                    <span class='summary-chip'>Watchlist Size: {backtest_summary.get("watchlist_size", 0)}</span>
+                </div>
+            </div>
+        </div>
+        """,
+        unsafe_allow_html=True,
+    )
+
+    m1, m2, m3, m4 = st.columns(4, gap="medium")
+    m1.metric("Trade-Ready Hit Rate", f"{candidate_like.get('success_rate', 0):.1f}%" if candidate_like.get("success_rate") is not None else "N/A")
+    m2.metric("Avg 20D Return", f"{candidate_like.get('avg_20d_return_pct', 0):.2f}%" if candidate_like.get("avg_20d_return_pct") is not None else "N/A")
+    m3.metric("Avg Max Drawdown", f"{candidate_like.get('avg_max_drawdown_pct', 0):.2f}%" if candidate_like.get("avg_max_drawdown_pct") is not None else "N/A")
+    m4.metric("Trade-Ready Samples", f"{candidate_like.get('signal_count', 0)}")
+
+    left, right = st.columns([1.25, 1], gap="large")
+
+    with left:
+        labels = backtest_summary.get("labels") or {}
+        if labels:
+            label_rows = []
+            for label, stats in labels.items():
+                label_rows.append(
+                    {
+                        "Signal": label,
+                        "Samples": stats.get("signal_count"),
+                        "Hit Rate %": stats.get("success_rate"),
+                        "Support Hold %": stats.get("support_hold_rate"),
+                        "Avg 10D %": stats.get("avg_10d_return_pct"),
+                        "Avg 20D %": stats.get("avg_20d_return_pct"),
+                        "Avg Drawdown %": stats.get("avg_max_drawdown_pct"),
+                    }
+                )
+            label_df = pd.DataFrame(label_rows)
+            if not label_df.empty:
+                label_df["_order"] = label_df["Signal"].map(LABEL_PRIORITY).fillna(99)
+                label_df = label_df.sort_values(["_order", "Samples"], ascending=[True, False]).drop(columns="_order")
+            st.markdown("<div class='table-context'>This is the historical scorecard by signal label using the dashboard's underlying proxy backtest.</div>", unsafe_allow_html=True)
+            st.dataframe(style_ranked_table(label_df), use_container_width=True, hide_index=True)
+        else:
+            st.info("No label-level backtest results are available yet.")
+
+    with right:
+        note_blocks = []
+        for note in learning_notes[:4]:
+            note_blocks.append(f"<div class='reason-bullet'>- {colorize_signal_reason(note)}</div>")
+        if source_summary:
+            note_blocks.append(
+                f"<div class='reason-bullet'>- Recent candidate sample count: {source_summary.get('candidate_signal_count', 0)} | success rate: {source_summary.get('candidate_success_rate', 'N/A')}%</div>"
+            )
+            note_blocks.append(
+                f"<div class='reason-bullet'>- Recent high-probability sample count: {source_summary.get('high_probability_signal_count', 0)} | success rate: {source_summary.get('high_probability_success_rate', 'N/A')}%</div>"
+            )
+
+        st.markdown(
+            f"""
+            <div class='reason-group-card'>
+                <div class='reason-group-title'>What The System Learned</div>
+                {''.join(note_blocks) if note_blocks else "<div class='reason-bullet'>- No rule adjustments were needed from the latest backtest cycle.</div>"}
+            </div>
+            """,
+            unsafe_allow_html=True,
+        )
+
+        method_cards = "".join([f"<div class='reason-bullet'>- {note}</div>" for note in method_notes[:3]])
+        st.markdown(
+            f"""
+            <div class='reason-group-card'>
+                <div class='reason-group-title'>Method Notes</div>
+                {method_cards}
             </div>
             """,
             unsafe_allow_html=True,
@@ -884,6 +1041,7 @@ def build_summary_counts(df: pd.DataFrame):
     return {
         "High Probability Put Sell": int((df["label"] == "High Probability Put Sell").sum()),
         "Put Sell Candidate": int((df["label"] == "Put Sell Candidate").sum()),
+        "Stalk / Watchlist": int((df["label"] == "Stalk / Watchlist").sum()),
         "Neutral / Wait": int((df["label"] == "Neutral / Wait").sum()),
         "Downtrend Risk": int((df["label"] == "Downtrend Risk").sum()),
         "Breakdown Risk": int((df["label"] == "Breakdown Risk").sum()),
@@ -1191,10 +1349,12 @@ def render_deep_dive_section(selected_symbol, stock_df, stock_signal, trade_leve
 
     action_color = signal_hex
     entry_status_lower = (trade_levels.get("entry_status") or "").lower()
-    if "wait" in entry_status_lower:
-        action_color = "#facc15"
-    elif "pressure" in entry_status_lower or stock_signal.get("risk_score", 0) <= -4:
+    if "pressure" in entry_status_lower or stock_signal.get("risk_score", 0) <= -4:
         action_color = "#ef4444"
+    elif stock_signal["label"] == "Stalk / Watchlist":
+        action_color = "#60a5fa"
+    elif "wait" in entry_status_lower:
+        action_color = "#facc15"
 
     st.markdown(
         f"""
@@ -1625,8 +1785,8 @@ def render_deep_dive_section(selected_symbol, stock_df, stock_signal, trade_leve
         blockers = stock_signal.get("candidate_blockers") or []
         if stock_signal["label"] not in {"Put Sell Candidate", "High Probability Put Sell"} and blockers:
             render_section_header(
-                "What Is Holding This Back",
-                "These are the main reasons the stock is not currently qualifying as a put-sell candidate.",
+                "What Is Preventing A Trade-Ready Signal",
+                "These are the main reasons the stock is not currently qualifying as a stronger put-selling setup.",
                 "Blockers",
             )
             blocker_cards = "".join(
@@ -1672,13 +1832,15 @@ def render_deep_dive_section(selected_symbol, stock_df, stock_signal, trade_leve
 
 
 @st.cache_data(ttl=900)
-def load_stock_analysis(symbol: str):
-    return analyze_stock(symbol)
+def load_stock_analysis(symbol: str, learning_sig: str = ""):
+    del learning_sig
+    return analyze_stock(symbol, learning_profile=load_learning_profile())
 
 
 @st.cache_data(ttl=900)
-def load_stock_snapshot(symbol: str):
-    return summarize_stock(symbol)
+def load_stock_snapshot(symbol: str, learning_sig: str = ""):
+    del learning_sig
+    return summarize_stock(symbol, learning_profile=load_learning_profile())
 
 
 def run_full_analysis():
@@ -1695,20 +1857,33 @@ def run_full_analysis():
     total = len(tickers)
     results = []
 
+    progress_text.caption("Refreshing automatic backtest and learning profile...")
+    progress_bar.progress(8, text="Running automatic backtest and learning...")
+    learning_profile, backtest_summary, learning_refreshed = run_automatic_learning_cycle(tickers)
+    st.session_state.learning_profile = learning_profile
+    st.session_state.backtest_summary = backtest_summary
+
+    learning_sig = learning_signature(learning_profile)
+    if learning_refreshed:
+        load_stock_snapshot.clear()
+        load_stock_analysis.clear()
+
+    progress_bar.progress(12, text="Scoring live watchlist with the latest learning profile...")
+
     for idx, symbol in enumerate(tickers, start=1):
-        progress_pct = int(((idx - 1) / total) * 85)
+        progress_pct = 12 + int(((idx - 1) / total) * 73)
         progress_text.caption(f"Analyzing {symbol} ({idx}/{total})...")
         progress_bar.progress(progress_pct, text=f"Running analysis for {symbol}...")
 
         try:
-            results.append(load_stock_snapshot(symbol))
+            results.append(load_stock_snapshot(symbol, learning_sig))
         except Exception as e:
             results.append({
                 "symbol": symbol,
                 "error": str(e),
             })
 
-        progress_pct = int((idx / total) * 85)
+        progress_pct = 12 + int((idx / total) * 73)
         progress_bar.progress(progress_pct, text=f"Finished {symbol}.")
 
     progress_bar.progress(88, text="Building watchlist results...")
@@ -1735,6 +1910,8 @@ def run_full_analysis():
     st.session_state.analysis_df = clean_df
     st.session_state.error_df = error_df
     st.session_state.analysis_ready = not clean_df.empty
+    st.session_state.learning_profile = learning_profile
+    st.session_state.backtest_summary = backtest_summary
 
     if not clean_df.empty and st.session_state.selected_symbol not in clean_df["symbol"].tolist():
         st.session_state.selected_symbol = clean_df["symbol"].iloc[0]
@@ -1758,6 +1935,12 @@ if "error_df" not in st.session_state:
 
 if "analysis_ready" not in st.session_state:
     st.session_state.analysis_ready = False
+
+if "learning_profile" not in st.session_state:
+    st.session_state.learning_profile = load_learning_profile()
+
+if "backtest_summary" not in st.session_state:
+    st.session_state.backtest_summary = load_backtest_summary()
 
 
 with st.sidebar:
@@ -1793,6 +1976,7 @@ with st.sidebar:
                 "All",
                 "High Probability Put Sell",
                 "Put Sell Candidate",
+                "Stalk / Watchlist",
                 "Neutral / Wait",
                 "Downtrend Risk",
                 "Breakdown Risk",
@@ -1899,7 +2083,7 @@ with hero_left:
         <div class='hero-shell'>
             <div class='hero-kicker'>Cash-Secured Put Workflow</div>
             <div class='hero-title'>Put Selling Dashboard</div>
-            <div class='hero-subtitle'>Screen watchlist names, identify cleaner support-based entries, and quickly separate actionable setups from names that deserve patience or avoidance.</div>
+            <div class='hero-subtitle'>Screen watchlist names, separate live put-sale setups from stalk-list names, and keep the support-and-bounce decision process easy to read.</div>
             <div>
                 <span class='summary-chip'>Watchlist: {len(st.session_state.watchlist)} ticker(s)</span>
                 <span class='summary-chip'>Filter: {signal_filter}</span>
@@ -1966,7 +2150,7 @@ if st.session_state.analysis_ready and st.session_state.analysis_df is not None:
             st.dataframe(error_df, use_container_width=True, hide_index=True)
         st.stop()
 
-    clean_df = clean_df.sort_values(["score", "confidence"], ascending=[False, False]).reset_index(drop=True)
+    clean_df = sort_signal_df(clean_df).reset_index(drop=True)
 
     filtered_df = clean_df.copy()
     if signal_filter != "All":
@@ -1982,7 +2166,7 @@ if st.session_state.analysis_ready and st.session_state.analysis_df is not None:
     if st.session_state.selected_symbol not in filtered_df["symbol"].tolist():
         st.session_state.selected_symbol = filtered_df["symbol"].iloc[0]
 
-    counts = build_summary_counts(filtered_df)
+    counts = build_summary_counts(clean_df)
 
     # Global market context from the first analyzed stock row
     market_regime = clean_df["market_regime"].iloc[0] if "market_regime" in clean_df.columns and not clean_df.empty else "Unknown"
@@ -2004,12 +2188,16 @@ if st.session_state.analysis_ready and st.session_state.analysis_df is not None:
         clean_df["label"].isin(["High Probability Put Sell", "Put Sell Candidate"])
     ].sort_values(["score", "confidence"], ascending=[False, False]).head(5)
 
+    stalk_names = clean_df[
+        clean_df["label"] == "Stalk / Watchlist"
+    ].sort_values(["score", "confidence"], ascending=[False, False]).head(6)
+
     avoid_names = clean_df[
         clean_df["label"].isin(["Downtrend Risk", "Breakdown Risk"])
     ].sort_values(["score", "confidence"], ascending=[True, True]).head(5)
 
-    trade_queue_tab, ranking_tab, deep_dive_tab, guide_tab = st.tabs(
-        ["Trade Queue", "Full Ranking", "Stock Deep Dive", "Guide"]
+    trade_queue_tab, ranking_tab, deep_dive_tab, backtest_tab, guide_tab = st.tabs(
+        ["Trade Queue", "Full Ranking", "Stock Deep Dive", "Auto Backtest", "Guide"]
     )
 
     with trade_queue_tab:
@@ -2023,12 +2211,13 @@ if st.session_state.analysis_ready and st.session_state.analysis_df is not None:
             unsafe_allow_html=True,
         )
 
-        c1, c2, c3, c4, c5 = st.columns(5, gap="medium")
+        c1, c2, c3, c4, c5, c6 = st.columns(6, gap="medium")
         c1.metric("High Conviction", counts["High Probability Put Sell"])
         c2.metric("Candidates", counts["Put Sell Candidate"])
-        c3.metric("Neutral", counts["Neutral / Wait"])
-        c4.metric("Downtrend Risk", counts["Downtrend Risk"])
-        c5.metric("Breakdown Risk", counts["Breakdown Risk"])
+        c3.metric("Stalk", counts["Stalk / Watchlist"])
+        c4.metric("Neutral", counts["Neutral / Wait"])
+        c5.metric("Downtrend Risk", counts["Downtrend Risk"])
+        c6.metric("Breakdown Risk", counts["Breakdown Risk"])
 
         st.markdown(
             f"""
@@ -2055,12 +2244,12 @@ if st.session_state.analysis_ready and st.session_state.analysis_df is not None:
         with left:
             render_section_header(
                 "Actionable Setups",
-                "These are the names with the best current case for stalking or placing a put sale.",
+                "These are the names closest to an actual put-selling decision right now.",
                 "Short List",
             )
             if not qualified_put_sells.empty:
                 st.markdown(
-                    "<div class='table-context'>Read each row left to right: stock, nearby support, preferred entry, then the signal and conviction.</div>",
+                    "<div class='table-context'>Read each row left to right: stock, nearby support, preferred entry, then entry readiness and conviction.</div>",
                     unsafe_allow_html=True,
                 )
                 left_display = prepare_display_table(
@@ -2085,10 +2274,43 @@ if st.session_state.analysis_ready and st.session_state.analysis_df is not None:
                     hide_index=True
                 )
             else:
-                st.markdown("### Best Underlying Names To Watch")
                 st.markdown(
-                    "<div class='soft-danger-text'>No stocks currently meet the put-sell candidate threshold, so this view shows the highest-ranked names worth monitoring rather than forcing an entry.</div>",
+                    "<div class='soft-danger-text'>No stocks currently qualify as trade-ready put setups. Use the stalk list below instead of forcing an entry.</div>",
                     unsafe_allow_html=True
+                )
+
+            render_section_header(
+                "Worth Stalking",
+                "These names may still be worth owning on assignment, but the timing is not ready enough yet for a disciplined put sale.",
+                "Pipeline",
+            )
+            if stalk_names.empty:
+                st.info("No stalk-list names are standing out right now.")
+            else:
+                st.markdown(
+                    "<div class='table-context'>These are better treated as monitored names than immediate trades. Wait for a cleaner pullback, support test, or bounce confirmation.</div>",
+                    unsafe_allow_html=True,
+                )
+                stalk_display = prepare_display_table(
+                    build_ranked_display_df(stalk_names),
+                    [
+                        "symbol",
+                        "price",
+                        "primary_support",
+                        "recommended_entry",
+                        "entry_status",
+                        "support_strength_label",
+                        "bounce_signal",
+                        "label",
+                        "score",
+                        "confidence",
+                        "setup_note",
+                    ],
+                )
+                st.dataframe(
+                    style_ranked_table(stalk_display),
+                    use_container_width=True,
+                    hide_index=True,
                 )
 
         with right:
@@ -2135,11 +2357,11 @@ if st.session_state.analysis_ready and st.session_state.analysis_df is not None:
     with ranking_tab:
         render_section_header(
             "Ranked Watchlist",
-            "This is the full filtered ranking. Read it like a trade sheet: support first, then entry readiness, then the scoring breakdown.",
+            "This is the full filtered ranking. The best trade-ready labels stay on top, then the stalk list, then the wait-or-avoid names.",
             "Ranking",
         )
         st.markdown(
-            "<div class='table-context'>Focus on whether price is near support, whether the entry looks confirmed or still early, and whether the score profile is strong enough to justify assignment.</div>",
+            "<div class='table-context'>Focus first on label, support location, and bounce quality. Then use the score columns to judge assignment comfort, timing, and downside control.</div>",
             unsafe_allow_html=True,
         )
         ranked_display_df = prepare_display_table(
@@ -2200,12 +2422,16 @@ if st.session_state.analysis_ready and st.session_state.analysis_df is not None:
 
         with st.spinner(f"Loading analysis for {selected_symbol}..."):
             try:
-                stock_df, stock_signal, trade_levels, regime_data = load_stock_analysis(selected_symbol)
+                active_learning_sig = learning_signature(st.session_state.learning_profile)
+                stock_df, stock_signal, trade_levels, regime_data = load_stock_analysis(selected_symbol, active_learning_sig)
             except Exception as e:
                 st.error(str(e))
                 st.stop()
 
         render_deep_dive_section(selected_symbol, stock_df, stock_signal, trade_levels, regime_data)
+
+    with backtest_tab:
+        render_auto_backtest_summary(st.session_state.backtest_summary, st.session_state.learning_profile)
 
     with guide_tab:
         render_guide_content()

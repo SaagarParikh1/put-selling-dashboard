@@ -16,7 +16,20 @@ def _pct_diff(a, b):
     return ((a - b) / b) * 100
 
 
-def score_stock(latest_row: pd.Series) -> dict:
+def _profile_adjustment(profile: dict | None, key: str, low: int = -2, high: int = 2) -> int:
+    if not profile:
+        return 0
+
+    adjustments = profile.get("threshold_adjustments") or {}
+    try:
+        value = int(round(float(adjustments.get(key, 0))))
+    except Exception:
+        return 0
+
+    return max(low, min(high, value))
+
+
+def score_stock(latest_row: pd.Series, learning_profile: dict | None = None) -> dict:
     """
     Score a stock specifically for cash-secured put selling.
 
@@ -93,6 +106,7 @@ def score_stock(latest_row: pd.Series) -> dict:
     bounce_confirmed = _safe_get(latest_row, "bounce_confirmed", False)
     support_strength = _safe_get(latest_row, "support_strength")
     support_confluence_count = _safe_get(latest_row, "support_confluence_count")
+    support_distance_pct = _safe_get(latest_row, "support_distance_pct")
 
     # -----------------------------
     # Initialize score buckets
@@ -638,9 +652,17 @@ def score_stock(latest_row: pd.Series) -> dict:
             entry_score += 2
             reasons.append("Price is starting to bounce from support, though confirmation is still early")
         elif "at support, no bounce yet" in signal:
+            score -= 2
+            entry_score -= 2
+            risk_score -= 1
+            reasons.append("Price is at support, but bounce confirmation has not shown up yet")
+        elif "near support" in signal:
+            entry_score += 0
+            reasons.append("Price is moving closer to support, but the actual support test is not complete yet")
+        elif "no bounce setup" in signal:
             score -= 1
             entry_score -= 1
-            reasons.append("Price is at support, but bounce confirmation has not shown up yet")
+            reasons.append("The stock is not yet in a cleaner support-test area for fresh put selling")
         elif "broken below support" in signal:
             score -= 4
             support_score -= 3
@@ -729,17 +751,28 @@ def score_stock(latest_row: pd.Series) -> dict:
 
     entry_status_lower = entry_status.lower() if isinstance(entry_status, str) else ""
     bounce_signal_lower = bounce_signal.lower() if isinstance(bounce_signal, str) else ""
-    strong_timing_ready = (
-        bounce_confirmed
-        or "confirmed bounce" in bounce_signal_lower
-        or "early bounce" in bounce_signal_lower
-        or entry_status_lower in {"in entry zone", "watch for stabilization"}
-    )
+    in_entry_zone = entry_status_lower == "in entry zone"
+    watch_stabilization = entry_status_lower == "watch for stabilization"
+    wait_for_pullback = entry_status_lower == "wait for pullback"
+    confirmed_bounce = bounce_confirmed or "confirmed bounce" in bounce_signal_lower
+    early_bounce = "early bounce" in bounce_signal_lower
+    at_support_no_bounce = "at support, no bounce yet" in bounce_signal_lower
+    near_support = "near support" in bounce_signal_lower
+    no_bounce_setup = "no bounce setup" in bounce_signal_lower
+
+    strong_timing_ready = confirmed_bounce or (early_bounce and in_entry_zone)
     candidate_timing_ready = (
         strong_timing_ready
-        or entry_status_lower == "wait for pullback"
-        or "near support" in bounce_signal_lower
-        or "no bounce setup" in bounce_signal_lower
+        or early_bounce
+        or in_entry_zone
+        or watch_stabilization
+        or at_support_no_bounce
+    )
+    stalk_timing_ready = (
+        candidate_timing_ready
+        or wait_for_pullback
+        or near_support
+        or no_bounce_setup
     )
     support_broken = (
         "support under pressure" in entry_status_lower
@@ -757,40 +790,75 @@ def score_stock(latest_row: pd.Series) -> dict:
         and (not _is_valid(realized_vol_20) or realized_vol_20 <= 0.65)
         and (not _is_valid(downside_vol_ratio_20) or downside_vol_ratio_20 < 0.9)
     )
+    stalk_min_score = 5
+    stalk_min_quality = 5
+    stalk_min_risk = -4
+    candidate_min_score = 8 + _profile_adjustment(learning_profile, "candidate_min_score")
+    candidate_min_quality = 5 + _profile_adjustment(learning_profile, "candidate_min_quality")
+    candidate_min_entry = 0 + _profile_adjustment(learning_profile, "candidate_min_entry")
+    candidate_min_risk = -4 + _profile_adjustment(learning_profile, "candidate_min_risk")
+    high_probability_min_score_neutral = 14 + _profile_adjustment(learning_profile, "high_probability_min_score")
+    high_probability_min_score_supportive = 13 + _profile_adjustment(learning_profile, "high_probability_min_score")
+    high_probability_min_quality = 8 + _profile_adjustment(learning_profile, "high_probability_min_quality")
+    high_probability_min_entry = 3 + _profile_adjustment(learning_profile, "high_probability_min_entry")
+    high_probability_min_risk = -2 + _profile_adjustment(learning_profile, "high_probability_min_risk")
     assignment_ready = (
         liquidity_ok is True
-        and quality_score >= 4
-        and risk_score >= -5
+        and quality_score >= stalk_min_quality
+        and risk_score >= stalk_min_risk
         and not extreme_instability
     )
     support_ready = (
         not support_broken
         and (not _is_valid(support_strength) or support_strength >= 4)
     )
-    prime_setup = (
+    candidate_support_ready = (
+        support_ready
+        and (not _is_valid(support_strength) or support_strength >= 5)
+        and (support_distance_pct is None or support_distance_pct <= 6.5)
+    )
+    prime_support_ready = (
+        support_ready
+        and (not _is_valid(support_strength) or support_strength >= 7)
+        and (
+            support_distance_pct is None
+            or support_distance_pct <= 4.0
+            or in_entry_zone
+        )
+    )
+    stalk_setup = (
         assignment_ready
         and support_ready
+        and stalk_timing_ready
+        and quality_score >= stalk_min_quality
+        and risk_score >= stalk_min_risk
+    )
+    prime_setup = (
+        assignment_ready
+        and prime_support_ready
         and strong_timing_ready
-        and quality_score >= 8
-        and entry_score >= 2
-        and risk_score >= -2
+        and quality_score >= high_probability_min_quality
+        and entry_score >= high_probability_min_entry
+        and risk_score >= high_probability_min_risk
+        and controlled_volatility
         and not cautionary_fail
     )
     candidate_setup = (
         assignment_ready
-        and support_ready
+        and candidate_support_ready
         and candidate_timing_ready
-        and quality_score >= 4
-        and entry_score >= -1
-        and risk_score >= -5
+        and quality_score >= candidate_min_quality
+        and entry_score >= candidate_min_entry
+        and risk_score >= candidate_min_risk
+        and controlled_volatility
     )
 
     candidate_blockers = []
     if liquidity_ok is False:
         candidate_blockers.append("Liquidity is too thin for a higher-quality put-selling setup.")
-    if quality_score < 4:
+    if quality_score < candidate_min_quality:
         candidate_blockers.append("Underlying quality is not strong enough to justify assignment yet.")
-    if risk_score < -5:
+    if risk_score < candidate_min_risk:
         candidate_blockers.append("Downside risk is still too elevated for a candidate label.")
     if extreme_instability:
         candidate_blockers.append("Volatility is too extreme right now for a conservative cash-secured put setup.")
@@ -798,10 +866,14 @@ def score_stock(latest_row: pd.Series) -> dict:
         candidate_blockers.append("Support is failing or already broken, so the setup is not trustworthy enough.")
     elif _is_valid(support_strength) and support_strength < 4:
         candidate_blockers.append("Support quality is too weak and lacks enough confluence.")
+    elif support_distance_pct is not None and support_distance_pct > 6.5:
+        candidate_blockers.append("Price is still too far above support to count as a disciplined put-selling location.")
     if not candidate_timing_ready:
         candidate_blockers.append("Price is not yet close enough to a usable support-based entry area.")
-    if entry_score < -1:
+    if entry_score < candidate_min_entry:
         candidate_blockers.append("Entry timing is still too poor for a put-selling candidate.")
+    if not controlled_volatility:
+        candidate_blockers.append("Volatility is still too active for a cleaner trade-ready put setup.")
 
     # -----------------------------
     # Labeling logic
@@ -824,11 +896,13 @@ def score_stock(latest_row: pd.Series) -> dict:
 
         if (
             candidate_setup
-            and quality_score >= 8
+            and quality_score >= max(6, candidate_min_quality)
             and entry_score >= 1
-            and score >= 12
+            and score >= max(10, candidate_min_score + 1)
         ):
             label = "Put Sell Candidate"
+        elif stalk_setup and score >= max(5, stalk_min_score):
+            label = "Stalk / Watchlist"
         elif score >= 2:
             label = "Neutral / Wait"
         elif score >= -8:
@@ -842,10 +916,12 @@ def score_stock(latest_row: pd.Series) -> dict:
             score -= 1
             risk_score -= 1
 
-        if prime_setup and score >= 12:
+        if prime_setup and score >= high_probability_min_score_neutral:
             label = "High Probability Put Sell"
-        elif candidate_setup and score >= 6:
+        elif candidate_setup and score >= candidate_min_score:
             label = "Put Sell Candidate"
+        elif stalk_setup and score >= stalk_min_score:
+            label = "Stalk / Watchlist"
         elif score >= 1:
             label = "Neutral / Wait"
         elif score >= -8:
@@ -859,10 +935,12 @@ def score_stock(latest_row: pd.Series) -> dict:
             score -= 1
             risk_score -= 1
 
-        if prime_setup and score >= 11:
+        if prime_setup and score >= high_probability_min_score_supportive:
             label = "High Probability Put Sell"
-        elif candidate_setup and score >= 5:
+        elif candidate_setup and score >= max(5, candidate_min_score - 1):
             label = "Put Sell Candidate"
+        elif stalk_setup and score >= max(4, stalk_min_score - 1):
+            label = "Stalk / Watchlist"
         elif score >= 1:
             label = "Neutral / Wait"
         elif score >= -8:
@@ -900,6 +978,27 @@ def score_stock(latest_row: pd.Series) -> dict:
         if severe_fail_reasons or warning_fail_reasons:
             confidence -= 12
 
+    elif label == "Stalk / Watchlist":
+        if quality_score >= 7:
+            confidence += 6
+        elif quality_score >= 5:
+            confidence += 4
+
+        if -1 <= entry_score <= 2:
+            confidence += 4
+        elif entry_score < -1:
+            confidence -= 3
+
+        if risk_score >= -2:
+            confidence += 4
+        elif risk_score <= -5:
+            confidence -= 6
+
+        if wait_for_pullback or near_support:
+            confidence += 4
+        if cautionary_fail:
+            confidence -= 6
+
     elif label == "Neutral / Wait":
         if 3 <= quality_score <= 7:
             confidence += 5
@@ -928,7 +1027,7 @@ def score_stock(latest_row: pd.Series) -> dict:
         inconsistency_penalty += 6
     if entry_score >= 4 and support_score <= 0:
         inconsistency_penalty += 4
-    if label in {"High Probability Put Sell", "Put Sell Candidate"} and flow_score <= -2:
+    if label in {"High Probability Put Sell", "Put Sell Candidate", "Stalk / Watchlist"} and flow_score <= -2:
         inconsistency_penalty += 4
     if label in {"Downtrend Risk", "Breakdown Risk"} and quality_score >= 5:
         inconsistency_penalty += 3

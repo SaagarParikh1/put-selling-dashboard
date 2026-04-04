@@ -1,0 +1,24 @@
+{
+  "version": 1,
+  "generated_at": "2026-04-04T18:57:27+00:00",
+  "watchlist_signature": "a70ba87e48881cf3",
+  "threshold_adjustments": {
+    "candidate_min_score": 0,
+    "candidate_min_quality": 0,
+    "candidate_min_entry": 0,
+    "candidate_min_risk": 0,
+    "high_probability_min_score": 0,
+    "high_probability_min_quality": 0,
+    "high_probability_min_entry": 0,
+    "high_probability_min_risk": 0
+  },
+  "notes": [
+    "No threshold adjustments were needed from the latest backtest cycle."
+  ],
+  "source_summary": {
+    "candidate_signal_count": 0,
+    "candidate_success_rate": null,
+    "high_probability_signal_count": 0,
+    "high_probability_success_rate": null
+  }
+}

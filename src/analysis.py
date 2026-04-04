@@ -355,7 +355,7 @@ def calculate_trade_levels(df):
     }
 
 
-def analyze_stock(symbol: str):
+def analyze_stock(symbol: str, learning_profile: dict | None = None):
     payload = fetch_stock_data(symbol, include_benchmark=True)
 
     df = payload["stock_df"]
@@ -377,13 +377,13 @@ def analyze_stock(symbol: str):
     for key, value in regime_data.items():
         latest[key] = value
 
-    signal = score_stock(latest)
+    signal = score_stock(latest, learning_profile=learning_profile)
 
     return df, signal, trade_levels, regime_data
 
 
-def summarize_stock(symbol: str) -> dict:
-    df, signal, trade_levels, regime_data = analyze_stock(symbol)
+def summarize_stock(symbol: str, learning_profile: dict | None = None) -> dict:
+    df, signal, trade_levels, regime_data = analyze_stock(symbol, learning_profile=learning_profile)
     latest = df.iloc[-1]
 
     return {

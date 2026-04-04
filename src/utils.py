@@ -177,7 +177,9 @@ def colorize_signal_reason(text: str) -> str:
         (r"\bmixed\b", "#facc15"),
         (r"\bwait\b", "#facc15"),
         (r"\bwatch\b", "#60a5fa"),
+        (r"\bstalk\b", "#60a5fa"),
         (r"\bstabilization\b", "#60a5fa"),
+        (r"\bcandidate\b", "#84cc16"),
         (r"\bcaution\b", "#fb923c"),
         (r"\bpressure\b", "#fb923c"),
         (r"\belevated\b", "#fb923c"),
@@ -236,7 +238,14 @@ def build_signal_takeaways(row) -> list[str]:
     liquidity_ok = row.get("liquidity_ok")
     bounce_signal = row.get("bounce_signal")
 
-    takeaways = [f"Current signal: **{label}**."]
+    if label == "High Probability Put Sell":
+        takeaways = ["Current signal: **High Probability Put Sell**. This is one of the cleaner trade-ready windows in the model."]
+    elif label == "Put Sell Candidate":
+        takeaways = ["Current signal: **Put Sell Candidate**. The setup is close enough to support to consider, but it is still one step below the highest-conviction tier."]
+    elif label == "Stalk / Watchlist":
+        takeaways = ["Current signal: **Stalk / Watchlist**. The stock may be worth owning, but the put-selling timing still needs to improve."]
+    else:
+        takeaways = [f"Current signal: **{label}**."]
 
     if quality_score is not None:
         if quality_score >= 8:
@@ -251,6 +260,8 @@ def build_signal_takeaways(row) -> list[str]:
             takeaways.append("Entry timing is favorable because price is sitting near a more attractive support-based area and looks tradeable now.")
         elif entry_score >= 2:
             takeaways.append("Entry timing is acceptable, but this still looks selective rather than automatic.")
+        elif label == "Stalk / Watchlist":
+            takeaways.append("Entry timing is not ready yet, which is why this is better treated as a stalk list name than a live put sale.")
         else:
             takeaways.append("Entry timing is not compelling yet, so patience is probably better than forcing a put sale before support proves itself.")
 
@@ -299,7 +310,7 @@ def build_action_suggestion(row) -> tuple[str, str]:
             "Even if the chart looks decent, thin liquidity can make put pricing and exits less reliable. For systematic put selling, that is a real drawback.",
         )
 
-    if label in {"High Probability Put Sell", "Put Sell Candidate"}:
+    if label == "High Probability Put Sell":
         if "confirmed bounce" in bounce_signal:
             return (
                 "Action Suggestion: This is one of the cleaner put-selling moments.",
@@ -312,7 +323,7 @@ def build_action_suggestion(row) -> tuple[str, str]:
             )
         if "in entry zone" in entry_status:
             return (
-                "Action Suggestion: Consider stalking an entry now.",
+                "Action Suggestion: Consider a disciplined put sale now.",
                 "The setup is constructive and price is already close to the preferred support area. If you sell a put here, keep strike selection disciplined around support and only use a strike where you would accept assignment.",
             )
         if "watch for stabilization" in entry_status:
@@ -321,8 +332,30 @@ def build_action_suggestion(row) -> tuple[str, str]:
                 "The setup is close, but price has not fully settled yet. Let support prove itself before leaning in.",
             )
         return (
+            "Action Suggestion: Conditions are favorable, but execution discipline still matters.",
+            "This is one of the cleaner put-selling windows in the model, but strike placement and assignment comfort still matter more than the label itself.",
+        )
+
+    if label == "Put Sell Candidate":
+        if "confirmed bounce" in bounce_signal or "early bounce" in bounce_signal:
+            return (
+                "Action Suggestion: Consider a disciplined put sale if the strike still respects support.",
+                "The stock is in a more usable part of the support map, but this is still a notch below the cleanest setups. Keep assignment comfort and downside room front and center.",
+            )
+        if "in entry zone" in entry_status or "watch for stabilization" in entry_status:
+            return (
+                "Action Suggestion: Keep stalking this for a cleaner trigger.",
+                "The underlying is acceptable and price is close enough to the entry area to matter, but the bounce still needs a bit more proof.",
+            )
+        return (
             "Action Suggestion: Keep it on the watchlist, but wait for a cleaner support-based entry.",
             "The underlying may still be acceptable, but the current location is not ideal enough to force a put sale before price pulls back or firms up near support.",
+        )
+
+    if label == "Stalk / Watchlist":
+        return (
+            "Action Suggestion: Stalk this name, but do not force a put sale yet.",
+            "This looks more like a stock worth monitoring than a stock that is ready right now. Wait for a better pullback into support or clearer bounce confirmation before treating it like a live put-selling setup.",
         )
 
     if label == "Neutral / Wait":
