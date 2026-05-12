@@ -1,0 +1,6 @@
+services:
+  - type: web
+    name: put-selling-dashboard
+    env: python
+    buildCommand: pip install -r requirements.txt
+    startCommand: streamlit run app.py --server.address 0.0.0.0 --server.port $PORT --server.headless true
