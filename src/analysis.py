@@ -355,11 +355,21 @@ def calculate_trade_levels(df):
     }
 
 
-def analyze_stock(symbol: str, learning_profile: dict | None = None):
-    payload = fetch_stock_data(symbol, include_benchmark=True)
-
-    df = payload["stock_df"]
-    benchmark_df = payload.get("benchmark_df")
+def analyze_stock(
+    symbol: str,
+    learning_profile: dict | None = None,
+    benchmark_df=None,
+    stock_df=None,
+):
+    if stock_df is None:
+        if benchmark_df is None:
+            payload = fetch_stock_data(symbol, include_benchmark=True)
+            df = payload["stock_df"]
+            benchmark_df = payload.get("benchmark_df")
+        else:
+            df = fetch_stock_data(symbol, include_benchmark=False)
+    else:
+        df = stock_df.copy()
 
     df = add_indicators(df, benchmark_df=benchmark_df)
 
@@ -382,8 +392,18 @@ def analyze_stock(symbol: str, learning_profile: dict | None = None):
     return df, signal, trade_levels, regime_data
 
 
-def summarize_stock(symbol: str, learning_profile: dict | None = None) -> dict:
-    df, signal, trade_levels, regime_data = analyze_stock(symbol, learning_profile=learning_profile)
+def summarize_stock(
+    symbol: str,
+    learning_profile: dict | None = None,
+    benchmark_df=None,
+    stock_df=None,
+) -> dict:
+    df, signal, trade_levels, regime_data = analyze_stock(
+        symbol,
+        learning_profile=learning_profile,
+        benchmark_df=benchmark_df,
+        stock_df=stock_df,
+    )
     latest = df.iloc[-1]
 
     return {

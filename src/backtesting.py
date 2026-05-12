@@ -8,7 +8,7 @@ from pathlib import Path
 import pandas as pd
 
 from src.analysis import calculate_trade_levels
-from src.fetch_data import fetch_stock_data
+from src.fetch_data import fetch_benchmark_data, fetch_many_stock_data, fetch_stock_data
 from src.indicators import add_indicators
 from src.regime import classify_market_regime
 from src.scoring import score_stock
@@ -22,6 +22,7 @@ LEARNING_PROFILE_PATH = DATA_DIR / "learning_profile.json"
 BACKTEST_PERIOD = "3y"
 BACKTEST_INTERVAL = "1d"
 BACKTEST_HORIZONS = (5, 10, 20)
+BACKTEST_MODEL_VERSION = 2
 MIN_SIGNAL_LOOKBACK = 220
 MAX_PROFILE_DELTA = 2
 
@@ -134,6 +135,9 @@ def save_backtest_summary(summary: dict) -> None:
 
 def _summary_is_fresh(summary: dict | None, watchlist: list[str], max_age_hours: int = 12) -> bool:
     if not summary:
+        return False
+
+    if summary.get("version") != BACKTEST_MODEL_VERSION:
         return False
 
     if summary.get("watchlist_signature") != _watchlist_signature(watchlist):
@@ -258,15 +262,32 @@ def _aggregate_label_records(records: list[dict]) -> dict:
     return labels
 
 
-def backtest_symbol(symbol: str, learning_profile: dict | None = None) -> dict:
-    payload = fetch_stock_data(
-        symbol,
-        include_benchmark=True,
-        period=BACKTEST_PERIOD,
-        interval=BACKTEST_INTERVAL,
-    )
-    stock_df = payload["stock_df"]
-    benchmark_df = payload.get("benchmark_df")
+def backtest_symbol(
+    symbol: str,
+    learning_profile: dict | None = None,
+    benchmark_df=None,
+    stock_df=None,
+) -> dict:
+    if stock_df is None:
+        if benchmark_df is None:
+            payload = fetch_stock_data(
+                symbol,
+                include_benchmark=True,
+                period=BACKTEST_PERIOD,
+                interval=BACKTEST_INTERVAL,
+            )
+            stock_df = payload["stock_df"]
+            benchmark_df = payload.get("benchmark_df")
+        else:
+            stock_df = fetch_stock_data(
+                symbol,
+                include_benchmark=False,
+                period=BACKTEST_PERIOD,
+                interval=BACKTEST_INTERVAL,
+            )
+    else:
+        stock_df = stock_df.copy()
+
     stock_df = add_indicators(stock_df, benchmark_df=benchmark_df)
 
     if len(stock_df) <= MIN_SIGNAL_LOOKBACK + max(BACKTEST_HORIZONS):
@@ -393,7 +414,7 @@ def derive_learning_profile(backtest_summary: dict, watchlist: list[str]) -> dic
     adjustments = {key: _clamp_int(value) for key, value in adjustments.items()}
 
     return {
-        "version": 1,
+        "version": BACKTEST_MODEL_VERSION,
         "generated_at": _utc_now_iso(),
         "watchlist_signature": _watchlist_signature(watchlist),
         "threshold_adjustments": adjustments,
@@ -501,9 +522,30 @@ def run_automatic_learning_cycle(watchlist: list[str], max_age_hours: int = 12) 
 
     current_profile = load_learning_profile()
     symbol_results = []
+    try:
+        benchmark_df = fetch_benchmark_data(period=BACKTEST_PERIOD, interval=BACKTEST_INTERVAL)
+    except Exception:
+        benchmark_df = None
+
+    try:
+        stock_data_map = fetch_many_stock_data(
+            normalized_watchlist,
+            period=BACKTEST_PERIOD,
+            interval=BACKTEST_INTERVAL,
+        )
+    except Exception:
+        stock_data_map = {}
+
     for symbol in normalized_watchlist:
         try:
-            symbol_results.append(backtest_symbol(symbol, learning_profile=current_profile))
+            symbol_results.append(
+                backtest_symbol(
+                    symbol,
+                    learning_profile=current_profile,
+                    benchmark_df=benchmark_df,
+                    stock_df=stock_data_map.get(symbol),
+                )
+            )
         except Exception as exc:
             symbol_results.append({"symbol": symbol, "error": str(exc)})
 

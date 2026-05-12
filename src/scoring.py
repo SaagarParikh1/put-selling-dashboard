@@ -10,6 +10,19 @@ def _safe_get(row: pd.Series, key: str, default=None):
     return row[key] if key in row and _is_valid(row[key]) else default
 
 
+def _safe_bool(value):
+    if not _is_valid(value):
+        return None
+    if isinstance(value, str):
+        normalized = value.strip().lower()
+        if normalized in {"true", "yes", "1", "pass", "ok"}:
+            return True
+        if normalized in {"false", "no", "0", "fail", "thin"}:
+            return False
+        return None
+    return bool(value)
+
+
 def _pct_diff(a, b):
     if not _is_valid(a) or not _is_valid(b) or b == 0:
         return None
@@ -85,7 +98,7 @@ def score_stock(latest_row: pd.Series, learning_profile: dict | None = None) -> 
     atr_pct = _safe_get(latest_row, "atr_pct")
     rs_20 = _safe_get(latest_row, "rs_20")
     rs_60 = _safe_get(latest_row, "rs_60")
-    liquidity_ok = _safe_get(latest_row, "liquidity_ok")
+    liquidity_ok = _safe_bool(_safe_get(latest_row, "liquidity_ok"))
     sma_50_slope_10 = _safe_get(latest_row, "sma_50_slope_10")
     sma_200_slope_20 = _safe_get(latest_row, "sma_200_slope_20")
     pullback_from_20d_high_pct = _safe_get(latest_row, "pullback_from_20d_high_pct")
@@ -103,7 +116,7 @@ def score_stock(latest_row: pd.Series, learning_profile: dict | None = None) -> 
     entry_status = _safe_get(latest_row, "entry_status", "")
     bounce_score = _safe_get(latest_row, "bounce_score")
     bounce_signal = _safe_get(latest_row, "bounce_signal", "")
-    bounce_confirmed = _safe_get(latest_row, "bounce_confirmed", False)
+    bounce_confirmed = _safe_bool(_safe_get(latest_row, "bounce_confirmed", False)) or False
     support_strength = _safe_get(latest_row, "support_strength")
     support_confluence_count = _safe_get(latest_row, "support_confluence_count")
     support_distance_pct = _safe_get(latest_row, "support_distance_pct")
@@ -760,9 +773,19 @@ def score_stock(latest_row: pd.Series, learning_profile: dict | None = None) -> 
     near_support = "near support" in bounce_signal_lower
     no_bounce_setup = "no bounce setup" in bounce_signal_lower
 
-    strong_timing_ready = confirmed_bounce or (early_bounce and in_entry_zone)
+    bounce_score_value = bounce_score if _is_valid(bounce_score) else 0
+    price_close_to_support = support_distance_pct is not None and support_distance_pct <= 5.0
+    support_is_firming = (
+        confirmed_bounce
+        or (early_bounce and (in_entry_zone or watch_stabilization or price_close_to_support))
+        or (bounce_score_value >= 5 and (in_entry_zone or watch_stabilization or price_close_to_support))
+    )
+    strong_timing_ready = confirmed_bounce or (
+        support_is_firming and bounce_score_value >= 5 and not at_support_no_bounce
+    )
     candidate_timing_ready = (
         strong_timing_ready
+        or support_is_firming
         or early_bounce
         or in_entry_zone
         or watch_stabilization
@@ -792,16 +815,16 @@ def score_stock(latest_row: pd.Series, learning_profile: dict | None = None) -> 
     )
     stalk_min_score = 5
     stalk_min_quality = 5
-    stalk_min_risk = -4
-    candidate_min_score = 8 + _profile_adjustment(learning_profile, "candidate_min_score")
-    candidate_min_quality = 5 + _profile_adjustment(learning_profile, "candidate_min_quality")
-    candidate_min_entry = 0 + _profile_adjustment(learning_profile, "candidate_min_entry")
-    candidate_min_risk = -4 + _profile_adjustment(learning_profile, "candidate_min_risk")
-    high_probability_min_score_neutral = 14 + _profile_adjustment(learning_profile, "high_probability_min_score")
-    high_probability_min_score_supportive = 13 + _profile_adjustment(learning_profile, "high_probability_min_score")
-    high_probability_min_quality = 8 + _profile_adjustment(learning_profile, "high_probability_min_quality")
-    high_probability_min_entry = 3 + _profile_adjustment(learning_profile, "high_probability_min_entry")
-    high_probability_min_risk = -2 + _profile_adjustment(learning_profile, "high_probability_min_risk")
+    stalk_min_risk = -6
+    candidate_min_score = 6 + _profile_adjustment(learning_profile, "candidate_min_score")
+    candidate_min_quality = 4 + _profile_adjustment(learning_profile, "candidate_min_quality")
+    candidate_min_entry = -1 + _profile_adjustment(learning_profile, "candidate_min_entry")
+    candidate_min_risk = -5 + _profile_adjustment(learning_profile, "candidate_min_risk")
+    high_probability_min_score_neutral = 12 + _profile_adjustment(learning_profile, "high_probability_min_score")
+    high_probability_min_score_supportive = 11 + _profile_adjustment(learning_profile, "high_probability_min_score")
+    high_probability_min_quality = 7 + _profile_adjustment(learning_profile, "high_probability_min_quality")
+    high_probability_min_entry = 2 + _profile_adjustment(learning_profile, "high_probability_min_entry")
+    high_probability_min_risk = -3 + _profile_adjustment(learning_profile, "high_probability_min_risk")
     assignment_ready = (
         liquidity_ok is True
         and quality_score >= stalk_min_quality
@@ -814,16 +837,17 @@ def score_stock(latest_row: pd.Series, learning_profile: dict | None = None) -> 
     )
     candidate_support_ready = (
         support_ready
-        and (not _is_valid(support_strength) or support_strength >= 5)
-        and (support_distance_pct is None or support_distance_pct <= 6.5)
+        and (not _is_valid(support_strength) or support_strength >= 4)
+        and (support_distance_pct is None or support_distance_pct <= 7.5)
     )
     prime_support_ready = (
         support_ready
-        and (not _is_valid(support_strength) or support_strength >= 7)
+        and (not _is_valid(support_strength) or support_strength >= 6)
         and (
             support_distance_pct is None
-            or support_distance_pct <= 4.0
+            or support_distance_pct <= 5.0
             or in_entry_zone
+            or (watch_stabilization and support_is_firming)
         )
     )
     stalk_setup = (
@@ -836,7 +860,7 @@ def score_stock(latest_row: pd.Series, learning_profile: dict | None = None) -> 
     prime_setup = (
         assignment_ready
         and prime_support_ready
-        and strong_timing_ready
+        and support_is_firming
         and quality_score >= high_probability_min_quality
         and entry_score >= high_probability_min_entry
         and risk_score >= high_probability_min_risk
@@ -866,7 +890,7 @@ def score_stock(latest_row: pd.Series, learning_profile: dict | None = None) -> 
         candidate_blockers.append("Support is failing or already broken, so the setup is not trustworthy enough.")
     elif _is_valid(support_strength) and support_strength < 4:
         candidate_blockers.append("Support quality is too weak and lacks enough confluence.")
-    elif support_distance_pct is not None and support_distance_pct > 6.5:
+    elif support_distance_pct is not None and support_distance_pct > 7.5:
         candidate_blockers.append("Price is still too far above support to count as a disciplined put-selling location.")
     if not candidate_timing_ready:
         candidate_blockers.append("Price is not yet close enough to a usable support-based entry area.")

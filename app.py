@@ -11,6 +11,7 @@ from src.backtesting import (
     load_learning_profile,
     run_automatic_learning_cycle,
 )
+from src.fetch_data import fetch_benchmark_data, fetch_many_stock_data
 from src.utils import (
     build_action_suggestion,
     build_avoid_reason,
@@ -89,6 +90,10 @@ st.markdown("""
     .guide-panel,
     .empty-state,
     .workspace-strip,
+    .ticker-rail,
+    .operator-board,
+    .market-cardlet,
+    .priority-card,
     .sidebar-status-shell,
     .sidebar-watchlist-shell,
     .status-box,
@@ -100,11 +105,11 @@ st.markdown("""
     }
 
     .hero-shell {
-        border-radius: 28px;
-        padding: 1.45rem 1.55rem 1.35rem 1.55rem;
+        border-radius: 26px;
+        padding: 1.12rem 1.22rem 1.05rem 1.22rem;
         position: relative;
         overflow: hidden;
-        margin-bottom: 0.9rem;
+        margin-bottom: 0.65rem;
     }
 
     .hero-shell::before {
@@ -138,21 +143,21 @@ st.markdown("""
 
     .hero-title {
         position: relative;
-        font-size: 2.95rem;
+        font-size: 2.36rem;
         line-height: 1.02;
         font-weight: 700;
         letter-spacing: -0.04em;
         color: #f7fbf8;
-        margin: 0.2rem 0 0.45rem 0;
+        margin: 0.18rem 0 0.34rem 0;
     }
 
     .hero-subtitle {
         position: relative;
-        max-width: 58rem;
+        max-width: 50rem;
         color: #c0d3cd;
-        font-size: 1rem;
-        line-height: 1.62;
-        margin: 0 0 1rem 0;
+        font-size: 0.96rem;
+        line-height: 1.55;
+        margin: 0 0 0.78rem 0;
     }
 
     .hero-note {
@@ -165,7 +170,7 @@ st.markdown("""
 
     .run-panel {
         border-radius: 24px;
-        padding: 1.1rem 1.15rem;
+        padding: 1rem 1.05rem;
         min-height: 100%;
     }
 
@@ -178,7 +183,7 @@ st.markdown("""
 
     .run-panel-value {
         font-family: "Space Grotesk", sans-serif;
-        font-size: 1.45rem;
+        font-size: 1.25rem;
         line-height: 1.05;
         font-weight: 700;
         margin-bottom: 0.45rem;
@@ -206,8 +211,8 @@ st.markdown("""
 
     .workspace-strip {
         border-radius: 22px;
-        padding: 1rem 1.15rem 0.9rem 1.15rem;
-        margin-bottom: 1rem;
+        padding: 0.85rem 1rem 0.78rem 1rem;
+        margin-bottom: 0.8rem;
     }
 
     .workspace-strip-title {
@@ -226,14 +231,122 @@ st.markdown("""
 
     .pill {
         display: inline-block;
-        padding: 0.5rem 0.84rem;
-        margin: 0.18rem 0.3rem 0.18rem 0;
+        padding: 0.42rem 0.74rem;
+        margin: 0.14rem 0.24rem 0.14rem 0;
         border-radius: 999px;
         background: rgba(14, 33, 43, 0.88);
         border: 1px solid rgba(129, 230, 217, 0.12);
         font-size: 0.86rem;
         font-weight: 700;
         color: #e5f4ef;
+    }
+
+    .ticker-rail {
+        border-radius: 22px;
+        padding: 0.8rem 0.95rem;
+        margin-bottom: 0.9rem;
+    }
+
+    .ticker-rail-top {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 0.75rem;
+        flex-wrap: wrap;
+        margin-bottom: 0.38rem;
+    }
+
+    .ticker-rail-title {
+        color: var(--text-main);
+        font-weight: 800;
+        font-size: 0.92rem;
+    }
+
+    .ticker-rail-meta {
+        color: var(--text-muted);
+        font-size: 0.82rem;
+        font-weight: 700;
+    }
+
+    .operator-board {
+        border-radius: 26px;
+        padding: 1rem;
+        margin-bottom: 1rem;
+    }
+
+    .operator-grid {
+        display: grid;
+        grid-template-columns: minmax(260px, 0.9fr) minmax(360px, 1.8fr);
+        gap: 0.85rem;
+        align-items: stretch;
+    }
+
+    .market-cardlet,
+    .priority-card {
+        border-radius: 20px;
+        padding: 0.95rem 1rem;
+        box-shadow: none;
+    }
+
+    .market-regime-line {
+        font-family: "Space Grotesk", sans-serif;
+        font-size: 1.32rem;
+        font-weight: 700;
+        letter-spacing: -0.03em;
+        margin: 0.2rem 0 0.42rem 0;
+    }
+
+    .market-copy,
+    .priority-copy {
+        color: #b8cbc6;
+        font-size: 0.9rem;
+        line-height: 1.55;
+    }
+
+    .signal-count-grid {
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 0.55rem;
+        margin-bottom: 0.75rem;
+    }
+
+    .signal-count-tile {
+        background: rgba(7, 19, 26, 0.54);
+        border: 1px solid rgba(129, 230, 217, 0.10);
+        border-radius: 17px;
+        padding: 0.72rem 0.76rem;
+        min-height: 88px;
+    }
+
+    .signal-count-label {
+        color: #9db5af;
+        font-size: 0.74rem;
+        font-weight: 800;
+        letter-spacing: 0.04em;
+        text-transform: uppercase;
+        line-height: 1.28;
+        margin-bottom: 0.36rem;
+    }
+
+    .signal-count-value {
+        font-family: "Space Grotesk", sans-serif;
+        font-size: 1.55rem;
+        line-height: 1;
+        font-weight: 700;
+    }
+
+    .priority-title {
+        font-size: 1.03rem;
+        font-weight: 800;
+        line-height: 1.38;
+        margin: 0.18rem 0 0.28rem 0;
+    }
+
+    .context-chip-row {
+        display: flex;
+        gap: 0.42rem;
+        flex-wrap: wrap;
+        margin-top: 0.7rem;
     }
 
     .section-card,
@@ -544,8 +657,15 @@ st.markdown("""
         .reason-group-card,
         .guide-panel,
         .empty-state,
-        .workspace-strip {
+        .workspace-strip,
+        .ticker-rail,
+        .operator-board {
             border-radius: 20px;
+        }
+
+        .operator-grid,
+        .signal-count-grid {
+            grid-template-columns: 1fr;
         }
     }
 </style>
@@ -566,6 +686,13 @@ def render_pills(items: list[str]) -> str:
     return "".join([f"<span class='pill'>{item}</span>" for item in items])
 
 
+def render_compact_pills(items: list[str], limit: int = 16) -> str:
+    shown = items[:limit]
+    extra_count = max(0, len(items) - len(shown))
+    extra = f"<span class='pill'>+{extra_count} more</span>" if extra_count else ""
+    return render_pills(shown) + extra
+
+
 def label_color(label: str) -> str:
     colors = {
         "High Probability Put Sell": "#22c55e",
@@ -576,6 +703,26 @@ def label_color(label: str) -> str:
         "Breakdown Risk": "#ef4444",
     }
     return colors.get(label, "#cbd5e1")
+
+
+def render_signal_count_grid(counts: dict) -> str:
+    ordered_labels = [
+        "High Probability Put Sell",
+        "Put Sell Candidate",
+        "Stalk / Watchlist",
+        "Neutral / Wait",
+        "Downtrend Risk",
+        "Breakdown Risk",
+    ]
+    tiles = []
+    for label in ordered_labels:
+        tiles.append(
+            "<div class='signal-count-tile'>"
+            f"<div class='signal-count-label'>{label}</div>"
+            f"<div class='signal-count-value' style='color:{label_color(label)};'>{counts.get(label, 0)}</div>"
+            "</div>"
+        )
+    return "<div class='signal-count-grid'>" + "".join(tiles) + "</div>"
 
 
 LABEL_PRIORITY = {
@@ -770,11 +917,11 @@ def render_guide_content() -> None:
             <div class='guide-block-copy'>
                 A typical <b>Put Sell Candidate</b> needs enough quality to justify assignment, a reasonable support map, and risk that is not already deteriorating.
                 It does <b>not</b> need a perfect entry today, but it should already be near a real support decision area.
-                In practice, better candidates usually have <b>Quality around 5+</b>, <b>Entry around 0 or better</b>, <b>Risk around -4 or better</b>, and price that is already testing or reclaiming support in a constructive way.
+                In practice, better candidates usually have <b>Quality around 4+</b>, <b>Entry around -1 or better</b>, <b>Risk around -5 or better</b>, and price that is already testing or reclaiming support in a constructive way.
                 <br><br>
                 <b>Stalk / Watchlist</b> is for names that may still be acceptable to own on assignment, but are too early, too extended above support, or still waiting on bounce confirmation.
                 <br><br>
-                <b>High Probability Put Sell</b> is stricter. It usually needs stronger quality, a support-based entry that is already firming up, and a clearer bounce or stabilization signal with fewer obvious risk flags.
+                <b>High Probability Put Sell</b> is stricter. It usually needs stronger quality, price within a disciplined support zone, evidence that support is firming or bouncing, controlled volatility, and fewer obvious risk flags.
             </div>
             """,
         ),
@@ -1800,27 +1947,45 @@ def run_full_analysis():
     st.session_state.learning_profile = learning_profile
     st.session_state.backtest_summary = backtest_summary
 
-    learning_sig = learning_signature(learning_profile)
     if learning_refreshed:
         load_stock_snapshot.clear()
         load_stock_analysis.clear()
 
-    progress_bar.progress(12, text="Scoring live watchlist with the latest learning profile...")
+    progress_bar.progress(12, text="Loading shared market benchmark...")
+    try:
+        benchmark_df = fetch_benchmark_data()
+    except Exception:
+        benchmark_df = None
+
+    progress_bar.progress(18, text="Downloading watchlist price history in one batch...")
+    try:
+        stock_data_map = fetch_many_stock_data(tickers)
+    except Exception:
+        stock_data_map = {}
+
+    progress_bar.progress(22, text="Scoring live watchlist with the latest learning profile...")
 
     for idx, symbol in enumerate(tickers, start=1):
-        progress_pct = 12 + int(((idx - 1) / total) * 73)
+        progress_pct = 22 + int(((idx - 1) / total) * 63)
         progress_text.caption(f"Analyzing {symbol} ({idx}/{total})...")
         progress_bar.progress(progress_pct, text=f"Running analysis for {symbol}...")
 
         try:
-            results.append(load_stock_snapshot(symbol, learning_sig))
+            results.append(
+                summarize_stock(
+                    symbol,
+                    learning_profile=learning_profile,
+                    benchmark_df=benchmark_df,
+                    stock_df=stock_data_map.get(symbol),
+                )
+            )
         except Exception as e:
             results.append({
                 "symbol": symbol,
                 "error": str(e),
             })
 
-        progress_pct = 12 + int((idx / total) * 73)
+        progress_pct = 22 + int((idx / total) * 63)
         progress_bar.progress(progress_pct, text=f"Finished {symbol}.")
 
     progress_bar.progress(88, text="Building watchlist results...")
@@ -2020,15 +2185,15 @@ analysis_status_note = (
     else "Run analysis from the sidebar to populate the trade queue, ranking, and deep dive."
 )
 
-hero_left, hero_right = st.columns([5.2, 1.8], vertical_alignment="center", gap="large")
+hero_left, hero_right = st.columns([4.4, 1.45], vertical_alignment="center", gap="large")
 
 with hero_left:
     st.markdown(
         f"""
         <div class='hero-shell'>
             <div class='hero-kicker'>Cash-Secured Put Workflow</div>
-            <div class='hero-title'>Put Selling Dashboard</div>
-            <div class='hero-subtitle'>A cleaner workspace for deciding whether a stock is ready for a cash-secured put now, worth stalking for later, or not attractive enough to touch.</div>
+            <div class='hero-title'>Put Selling Desk</div>
+            <div class='hero-subtitle'>A cleaner decision surface for spotting stocks near support, checking bounce quality, and separating live put-sale setups from names that need patience.</div>
             <div>
                 <span class='summary-chip'>Watchlist: {len(st.session_state.watchlist)} ticker(s)</span>
                 <span class='summary-chip'>Filter: {signal_filter}</span>
@@ -2053,17 +2218,19 @@ with hero_right:
     )
 
 st.markdown(
-    "<div class='hero-note'>Start by checking whether anything is actually in a disciplined support area. If not, use the stalk list instead of forcing a trade.</div>",
+    "<div class='hero-note'>Workflow: check the trade queue first, confirm support in the deep dive, then decide whether the premium is worth the assignment risk.</div>",
     unsafe_allow_html=True
 )
 
 if st.session_state.watchlist:
     st.markdown(
         f"""
-        <div class='workspace-strip'>
-            <div class='workspace-strip-title'>Active Watchlist</div>
-            <div class='workspace-strip-copy'>These are the symbols included every time the dashboard refreshes its scoring and backtest loop.</div>
-            {render_pills(st.session_state.watchlist)}
+        <div class='ticker-rail'>
+            <div class='ticker-rail-top'>
+                <div class='ticker-rail-title'>Active Watchlist</div>
+                <div class='ticker-rail-meta'>{len(st.session_state.watchlist)} symbol(s) scanned on refresh</div>
+            </div>
+            {render_compact_pills(st.session_state.watchlist)}
         </div>
         """,
         unsafe_allow_html=True
@@ -2138,54 +2305,32 @@ if st.session_state.analysis_ready and st.session_state.analysis_df is not None:
         queue_title = "This screen is mostly defensive right now. Avoid forcing put sales until price behavior improves."
         queue_color = "#ef4444"
 
-    render_section_header(
-        "Session Snapshot",
-        "Read the broad state first, then move into the actual trade queue.",
-        "Overview",
+    spy_dist_label = f"{spy_dist:.2f}%" if spy_dist is not None and not pd.isna(spy_dist) else "N/A"
+    operator_board_html = (
+        "<div class='operator-board'>"
+        "<div class='operator-grid'>"
+        "<div class='market-cardlet'>"
+        "<div class='section-eyebrow'>Market Backdrop</div>"
+        f"<div class='market-regime-line' style='color:{regime_hex};'>{market_regime} Regime</div>"
+        f"<div class='market-copy'>{regime_note}</div>"
+        "<div class='context-chip-row'>"
+        f"<span class='summary-chip'>SPY Close: {fmt_price(spy_close)}</span>"
+        f"<span class='summary-chip'>SPY vs 200 SMA: {spy_dist_label}</span>"
+        "</div>"
+        "</div>"
+        "<div class='priority-card'>"
+        "<div class='section-eyebrow'>Today's Decision Board</div>"
+        f"{render_signal_count_grid(counts)}"
+        f"<div class='priority-title' style='color:{queue_color};'>{queue_title}</div>"
+        "<div class='priority-copy'>Work left to right: live setups first, stalk-list names second, avoid-list names last.</div>"
+        "</div>"
+        "</div>"
+        "</div>"
     )
-
-    o1, o2, o3, o4, o5, o6 = st.columns(6, gap="medium")
-    o1.metric("High Conviction", counts["High Probability Put Sell"])
-    o2.metric("Candidates", counts["Put Sell Candidate"])
-    o3.metric("Stalk", counts["Stalk / Watchlist"])
-    o4.metric("Neutral", counts["Neutral / Wait"])
-    o5.metric("Downtrend Risk", counts["Downtrend Risk"])
-    o6.metric("Breakdown Risk", counts["Breakdown Risk"])
-
-    st.markdown(
-        f"""
-        <div class='queue-shell'>
-            <div style='display:flex; justify-content:space-between; align-items:flex-start; gap:1rem; flex-wrap:wrap;'>
-                <div>
-                    <div class='section-eyebrow'>Market Backdrop</div>
-                    <div style='font-size:1.15rem; font-weight:800; color:{regime_hex}; margin-bottom:0.28rem;'>
-                        {market_regime} Regime
-                    </div>
-                    <div style='color:#dce7e3; line-height:1.6; max-width:52rem;'>
-                        {regime_note}
-                    </div>
-                </div>
-                <div style='display:flex; flex-wrap:wrap; gap:0.45rem;'>
-                    <span class='summary-chip'>SPY Close: {fmt_price(spy_close)}</span>
-                    <span class='summary-chip'>SPY vs 200 SMA: {f"{spy_dist:.2f}%" if spy_dist is not None and not pd.isna(spy_dist) else "N/A"}</span>
-                </div>
-            </div>
-            <div style='margin-top:0.8rem; padding-top:0.8rem; border-top:1px solid rgba(129,230,217,0.10);'>
-                <div class='section-eyebrow'>What To Do Next</div>
-                <div style='font-size:1rem; font-weight:800; color:{queue_color}; margin-bottom:0.2rem;'>
-                    {queue_title}
-                </div>
-                <div style='color:#96ada7; line-height:1.55;'>
-                    Use the trade queue to separate live setups from names that only deserve monitoring.
-                </div>
-            </div>
-        </div>
-        """,
-        unsafe_allow_html=True,
-    )
+    st.markdown(operator_board_html, unsafe_allow_html=True)
 
     trade_queue_tab, ranking_tab, deep_dive_tab, backtest_tab, guide_tab = st.tabs(
-        ["Trade Queue", "Watchlist Table", "Deep Dive", "Backtest", "Guide"]
+        ["Queue", "Watchlist", "Deep Dive", "Backtest", "Guide"]
     )
 
     with trade_queue_tab:
