@@ -35,581 +35,518 @@ st.set_page_config(
 
 st.markdown("""
 <style>
+    @import url('https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Space+Grotesk:wght@500;700&display=swap');
+
     :root {
-        --bg-main: #0b1220;
-        --bg-card: #111827;
-        --bg-card-2: #0f172a;
-        --bg-soft: #172033;
-        --border: rgba(148, 163, 184, 0.18);
-        --text-main: #f8fafc;
-        --text-soft: #cbd5e1;
-        --text-muted: #94a3b8;
+        --bg-main: #08131a;
+        --bg-panel: rgba(10, 23, 31, 0.90);
+        --bg-panel-strong: rgba(12, 28, 37, 0.96);
+        --border: rgba(145, 191, 201, 0.16);
+        --text-main: #f4f7f4;
+        --text-muted: #93aba5;
         --green: #22c55e;
         --lime: #84cc16;
         --yellow: #facc15;
         --orange: #fb923c;
         --red: #ef4444;
-        --rose-soft: #fca5a5;
         --blue: #60a5fa;
-        --violet: #a78bfa;
-        --cyan: #67e8f9;
+        --shadow: 0 14px 34px rgba(0, 0, 0, 0.18);
+    }
+
+    html, body, [class*="css"] {
+        font-family: "Manrope", sans-serif;
     }
 
     .stApp {
         background:
-            radial-gradient(circle at top left, rgba(96,165,250,0.10), transparent 24%),
-            radial-gradient(circle at top right, rgba(167,139,250,0.08), transparent 22%),
-            linear-gradient(180deg, #08101d 0%, #0b1220 38%, #0a1020 100%);
+            radial-gradient(circle at 0% 0%, rgba(45, 212, 191, 0.11), transparent 24%),
+            radial-gradient(circle at 100% 0%, rgba(251, 113, 133, 0.10), transparent 22%),
+            linear-gradient(180deg, #071015 0%, #09171f 44%, #0a151d 100%);
         color: var(--text-main);
     }
 
     .block-container {
-        padding-top: 3.25rem;
-        padding-bottom: 2.5rem;
-        max-width: 1460px;
+        padding-top: 2rem;
+        padding-bottom: 2.85rem;
+        max-width: 1480px;
     }
 
-    .hero-title {
-        font-size: 2.85rem;
-        font-weight: 800;
-        margin-bottom: 0.2rem;
-        margin-top: 0.4rem;
-        letter-spacing: -0.02em;
-        color: #f8fbff;
+    h1, h2, h3, h4, .hero-title, .section-title {
+        font-family: "Space Grotesk", sans-serif !important;
     }
 
-    .hero-subtitle {
-        color: #b6c2d4;
-        margin-bottom: 0.95rem;
-        font-size: 1.02rem;
-        line-height: 1.6;
+    .stMarkdown h2, .stMarkdown h3, .stMarkdown h4 {
+        color: var(--text-main);
     }
 
-    .hero-note {
-        color: #97a8bf;
-        font-size: 0.9rem;
-        margin-top: 0.2rem;
-        margin-bottom: 0.2rem;
+    .hero-shell,
+    .run-panel,
+    .section-card,
+    .watchlist-card,
+    .queue-shell,
+    .decision-card,
+    .reason-group-card,
+    .guide-panel,
+    .empty-state,
+    .workspace-strip,
+    .sidebar-status-shell,
+    .sidebar-watchlist-shell,
+    .status-box,
+    .metric-tile,
+    div[data-testid="stMetric"] {
+        background: linear-gradient(180deg, var(--bg-panel-strong), rgba(10, 23, 31, 0.92));
+        border: 1px solid var(--border);
+        box-shadow: var(--shadow);
     }
 
     .hero-shell {
-        background:
-            radial-gradient(circle at top left, rgba(96,165,250,0.14), transparent 32%),
-            linear-gradient(135deg, rgba(15,23,42,0.98), rgba(17,24,39,0.96));
-        border: 1px solid rgba(148,163,184,0.14);
-        border-radius: 24px;
-        padding: 1.35rem 1.4rem 1.15rem 1.4rem;
-        box-shadow: 0 16px 40px rgba(0,0,0,0.22);
-        margin-bottom: 1rem;
+        border-radius: 28px;
+        padding: 1.45rem 1.55rem 1.35rem 1.55rem;
+        position: relative;
+        overflow: hidden;
+        margin-bottom: 0.9rem;
     }
 
-    .hero-kicker {
-        display: inline-flex;
-        align-items: center;
-        gap: 0.45rem;
-        font-size: 0.8rem;
+    .hero-shell::before {
+        content: "";
+        position: absolute;
+        inset: 0;
+        background:
+            radial-gradient(circle at top left, rgba(45, 212, 191, 0.18), transparent 32%),
+            radial-gradient(circle at bottom right, rgba(251, 113, 133, 0.12), transparent 28%);
+        pointer-events: none;
+    }
+
+    .hero-kicker,
+    .section-eyebrow,
+    .sidebar-kicker,
+    .decision-label,
+    .status-label,
+    .metric-title,
+    .reason-group-title {
+        font-size: 0.76rem;
         letter-spacing: 0.08em;
         text-transform: uppercase;
-        color: #93c5fd;
         font-weight: 800;
-        margin-bottom: 0.5rem;
+    }
+
+    .hero-kicker,
+    .section-eyebrow,
+    .sidebar-kicker {
+        color: #81e6d9;
+    }
+
+    .hero-title {
+        position: relative;
+        font-size: 2.95rem;
+        line-height: 1.02;
+        font-weight: 700;
+        letter-spacing: -0.04em;
+        color: #f7fbf8;
+        margin: 0.2rem 0 0.45rem 0;
+    }
+
+    .hero-subtitle {
+        position: relative;
+        max-width: 58rem;
+        color: #c0d3cd;
+        font-size: 1rem;
+        line-height: 1.62;
+        margin: 0 0 1rem 0;
+    }
+
+    .hero-note {
+        color: var(--text-muted);
+        font-size: 0.9rem;
+        line-height: 1.5;
+        margin-top: 0.2rem;
+        margin-bottom: 0.55rem;
+    }
+
+    .run-panel {
+        border-radius: 24px;
+        padding: 1.1rem 1.15rem;
+        min-height: 100%;
+    }
+
+    .run-panel-title {
+        color: var(--text-main);
+        font-size: 1.05rem;
+        font-weight: 800;
+        margin-bottom: 0.2rem;
+    }
+
+    .run-panel-value {
+        font-family: "Space Grotesk", sans-serif;
+        font-size: 1.45rem;
+        line-height: 1.05;
+        font-weight: 700;
+        margin-bottom: 0.45rem;
+    }
+
+    .run-panel-copy {
+        color: var(--text-muted);
+        font-size: 0.9rem;
+        line-height: 1.55;
     }
 
     .summary-chip {
         display: inline-flex;
         align-items: center;
         gap: 0.35rem;
-        padding: 0.45rem 0.72rem;
-        margin: 0.2rem 0.35rem 0.2rem 0;
+        padding: 0.48rem 0.78rem;
+        margin: 0.18rem 0.42rem 0.18rem 0;
         border-radius: 999px;
-        border: 1px solid rgba(148,163,184,0.14);
-        background: rgba(15,23,42,0.72);
-        color: #dbe7f4;
-        font-size: 0.88rem;
+        border: 1px solid rgba(129, 230, 217, 0.14);
+        background: rgba(10, 23, 31, 0.56);
+        color: #dff3ed;
+        font-size: 0.84rem;
         font-weight: 700;
     }
 
-    .subtle-card {
-        background: linear-gradient(135deg, rgba(15,23,42,0.82), rgba(17,24,39,0.78));
-        border: 1px solid rgba(148,163,184,0.12);
-        border-radius: 18px;
-        padding: 0.95rem 1rem;
-        margin-bottom: 0.9rem;
+    .workspace-strip {
+        border-radius: 22px;
+        padding: 1rem 1.15rem 0.9rem 1.15rem;
+        margin-bottom: 1rem;
     }
 
-    .empty-state {
-        background: linear-gradient(135deg, rgba(15,23,42,0.92), rgba(17,24,39,0.90));
-        border: 1px solid rgba(148,163,184,0.12);
-        border-radius: 22px;
-        padding: 1.3rem 1.35rem;
-        color: #d7e2ef;
-        margin-top: 0.8rem;
-        box-shadow: 0 12px 30px rgba(0,0,0,0.16);
+    .workspace-strip-title {
+        color: var(--text-main);
+        font-size: 0.95rem;
+        font-weight: 800;
+        margin-bottom: 0.18rem;
+    }
+
+    .workspace-strip-copy {
+        color: var(--text-muted);
+        font-size: 0.9rem;
+        line-height: 1.55;
+        margin-bottom: 0.5rem;
     }
 
     .pill {
         display: inline-block;
-        padding: 0.48rem 0.84rem;
-        margin: 0.22rem 0.34rem 0.22rem 0;
+        padding: 0.5rem 0.84rem;
+        margin: 0.18rem 0.3rem 0.18rem 0;
         border-radius: 999px;
-        background: linear-gradient(135deg, rgba(15,23,42,0.95), rgba(23,32,51,0.95));
-        border: 1px solid rgba(148,163,184,0.15);
-        font-size: 0.9rem;
-        font-weight: 600;
-        color: #e5edf7;
-        box-shadow: inset 0 1px 0 rgba(255,255,255,0.03);
+        background: rgba(14, 33, 43, 0.88);
+        border: 1px solid rgba(129, 230, 217, 0.12);
+        font-size: 0.86rem;
+        font-weight: 700;
+        color: #e5f4ef;
     }
 
-    .section-card {
-        background: linear-gradient(135deg, rgba(15,23,42,0.96), rgba(17,24,39,0.96));
-        border-radius: 18px;
-        padding: 1rem 1.05rem;
-        border: 1px solid rgba(148,163,184,0.14);
+    .section-card,
+    .watchlist-card,
+    .queue-shell,
+    .decision-card,
+    .reason-group-card,
+    .guide-panel,
+    .empty-state {
+        border-radius: 22px;
+        padding: 1.05rem 1.12rem;
         margin-bottom: 1rem;
-        box-shadow: 0 10px 30px rgba(0,0,0,0.18);
     }
 
     .section-header {
-        margin-top: 0.35rem;
-        margin-bottom: 0.8rem;
-    }
-
-    .section-eyebrow {
-        font-size: 0.78rem;
-        letter-spacing: 0.08em;
-        text-transform: uppercase;
-        color: #7dd3fc;
-        font-weight: 800;
-        margin-bottom: 0.2rem;
+        margin-top: 0.2rem;
+        margin-bottom: 0.7rem;
     }
 
     .section-title {
-        font-size: 1.45rem;
-        font-weight: 800;
-        color: #f8fafc;
-        letter-spacing: -0.02em;
-        margin-bottom: 0.15rem;
-    }
-
-    .section-subtitle {
-        color: #9fb0c8;
-        font-size: 0.95rem;
-        line-height: 1.55;
-    }
-
-    .watchlist-card {
-        background: linear-gradient(135deg, rgba(15,23,42,0.98), rgba(17,24,39,0.98));
-        border-radius: 18px;
-        padding: 1rem 1.2rem;
-        border: 1px solid rgba(148,163,184,0.14);
-        margin-bottom: 1rem;
-        box-shadow: 0 12px 32px rgba(0,0,0,0.16);
-    }
-
-    .sidebar-watchlist-shell {
-        background: linear-gradient(180deg, rgba(15,23,42,0.98), rgba(17,24,39,0.98));
-        border: 1px solid rgba(148,163,184,0.12);
-        border-radius: 16px;
-        padding: 0.9rem 0.9rem 0.8rem 0.9rem;
-        margin-top: 0.5rem;
-        margin-bottom: 0.75rem;
-        box-shadow: 0 8px 22px rgba(0,0,0,0.14);
-    }
-
-    .sidebar-watchlist-title {
-        font-size: 0.98rem;
+        font-size: 1.32rem;
         font-weight: 700;
-        color: #f8fafc;
-        margin-bottom: 0.15rem;
+        letter-spacing: -0.03em;
+        color: var(--text-main);
+        margin-bottom: 0.12rem;
+    }
+
+    .section-subtitle,
+    .sidebar-copy,
+    .sidebar-tip,
+    .guide-block-copy,
+    .decision-body,
+    .analysis-note,
+    .table-context {
+        color: var(--text-muted);
+        font-size: 0.92rem;
+        line-height: 1.6;
+    }
+
+    .sidebar-watchlist-title,
+    .guide-block-title {
+        color: var(--text-main);
+        font-size: 0.98rem;
+        font-weight: 800;
+        margin-bottom: 0.22rem;
     }
 
     .sidebar-watchlist-subtitle {
+        color: var(--text-muted);
         font-size: 0.8rem;
-        color: #9fb0c8;
-        margin-bottom: 0.2rem;
-    }
-
-    .sidebar-kicker {
-        font-size: 0.78rem;
-        letter-spacing: 0.08em;
-        text-transform: uppercase;
-        color: #7dd3fc;
-        font-weight: 800;
-        margin-bottom: 0.15rem;
-    }
-
-    .sidebar-title {
-        font-size: 1.15rem;
-        font-weight: 800;
-        color: #f8fafc;
-        margin-bottom: 0.2rem;
-    }
-
-    .sidebar-copy {
-        font-size: 0.88rem;
-        color: #9fb0c8;
-        line-height: 1.55;
-        margin-bottom: 0.2rem;
-    }
-
-    .sidebar-tip {
-        font-size: 0.84rem;
-        color: #cbd5e1;
-        line-height: 1.5;
-        margin-bottom: 0.45rem;
+        line-height: 1.45;
     }
 
     .soft-danger-text {
-        color: #fca5a5;
+        color: #ffb4b4;
         font-size: 0.9rem;
-        margin-top: -0.25rem;
-        margin-bottom: 0.45rem;
-    }
-
-    .stMarkdown h2, .stMarkdown h3, .stMarkdown h4 {
-        color: #f8fafc;
+        line-height: 1.55;
+        margin-bottom: 0.65rem;
     }
 
     div[data-testid="stMetric"] {
-        background: linear-gradient(135deg, rgba(15,23,42,0.95), rgba(17,24,39,0.95));
-        border: 1px solid rgba(148,163,184,0.12);
+        border-radius: 18px;
         padding: 0.85rem 0.95rem;
-        border-radius: 16px;
-        box-shadow: 0 8px 22px rgba(0,0,0,0.14);
     }
 
     div[data-testid="stMetricLabel"] {
-        color: #9fb0c8 !important;
-        font-weight: 600 !important;
+        color: var(--text-muted) !important;
+        font-weight: 700 !important;
+        font-size: 0.82rem !important;
+        letter-spacing: 0.02em;
     }
 
     div[data-testid="stMetricValue"] {
-        color: #f8fafc !important;
+        color: var(--text-main) !important;
     }
 
     div[data-testid="stDataFrame"] {
-        border-radius: 16px;
+        border-radius: 18px;
         overflow: hidden;
-        border: 1px solid rgba(148,163,184,0.10);
-        box-shadow: 0 8px 24px rgba(0,0,0,0.12);
+        border: 1px solid rgba(129, 230, 217, 0.10);
+        box-shadow: 0 10px 26px rgba(0, 0, 0, 0.14);
     }
 
     div[data-testid="stVerticalBlockBorderWrapper"] {
-        border-radius: 18px !important;
-        border: 1px solid rgba(148,163,184,0.12) !important;
-        background: linear-gradient(135deg, rgba(15,23,42,0.86), rgba(17,24,39,0.82));
-        box-shadow: 0 10px 26px rgba(0,0,0,0.12);
+        border-radius: 20px !important;
+        border: 1px solid rgba(129, 230, 217, 0.10) !important;
+        background: linear-gradient(180deg, rgba(10, 23, 31, 0.76), rgba(10, 23, 31, 0.68));
+        box-shadow: 0 8px 22px rgba(0, 0, 0, 0.10);
+    }
+
+    div[data-testid="stTabs"] {
+        margin-top: 0.15rem;
+    }
+
+    div[data-testid="stTabs"] [data-baseweb="tab-list"] {
+        gap: 0.45rem;
+        padding-bottom: 0.35rem;
     }
 
     div[data-testid="stTabs"] button {
-        border-radius: 12px 12px 0 0 !important;
-        font-weight: 700 !important;
-    }
-
-    div[data-testid="stTabs"] button[aria-selected="true"] {
-        color: #f8fafc !important;
-    }
-
-    section[data-testid="stSidebar"] {
-        background: linear-gradient(180deg, rgba(8,16,29,0.98), rgba(10,16,32,0.98));
-        border-right: 1px solid rgba(148,163,184,0.08);
-    }
-
-    section[data-testid="stSidebar"] .block-container {
-        padding-top: 1.3rem;
-        padding-bottom: 1.2rem;
-    }
-
-    div[data-baseweb="input"] input,
-    div[data-baseweb="select"] > div {
-        border-radius: 12px !important;
-    }
-
-    div[data-baseweb="input"] input {
-        background: rgba(15,23,42,0.75) !important;
-    }
-
-    section[data-testid="stSidebar"] div[data-testid="stButton"] button {
-        border-radius: 10px;
-        font-weight: 700;
-        transition: all 0.15s ease;
-    }
-
-    section[data-testid="stSidebar"] div[data-testid="stButton"] button[kind="primary"] {
-        background: linear-gradient(135deg, #2563eb, #0ea5e9) !important;
-        color: white !important;
-        border: none !important;
-        box-shadow: 0 12px 26px rgba(37,99,235,0.28) !important;
-        min-height: 2.9rem !important;
-        font-size: 0.98rem !important;
+        border-radius: 999px !important;
+        padding: 0.55rem 0.95rem !important;
+        border: 1px solid rgba(129, 230, 217, 0.12) !important;
+        background: rgba(10, 23, 31, 0.52) !important;
+        color: #a9c1bb !important;
         font-weight: 800 !important;
     }
 
+    div[data-testid="stTabs"] button[aria-selected="true"] {
+        background: linear-gradient(135deg, rgba(45, 212, 191, 0.22), rgba(96, 165, 250, 0.18)) !important;
+        border-color: rgba(129, 230, 217, 0.28) !important;
+        color: #f6fbf8 !important;
+    }
+
+    section[data-testid="stSidebar"] {
+        background:
+            radial-gradient(circle at top, rgba(45, 212, 191, 0.08), transparent 28%),
+            linear-gradient(180deg, #071219 0%, #0b1820 100%);
+        border-right: 1px solid rgba(129, 230, 217, 0.08);
+    }
+
+    section[data-testid="stSidebar"] .block-container {
+        padding-top: 1.25rem;
+        padding-bottom: 1.35rem;
+    }
+
+    section[data-testid="stSidebar"] div[data-testid="stButton"] button {
+        border-radius: 14px;
+        font-weight: 800;
+        transition: all 0.18s ease;
+    }
+
+    section[data-testid="stSidebar"] div[data-testid="stButton"] button[kind="primary"] {
+        background: linear-gradient(135deg, #14b8a6, #0ea5e9) !important;
+        color: white !important;
+        border: none !important;
+        box-shadow: 0 14px 26px rgba(20, 184, 166, 0.24) !important;
+        min-height: 3rem !important;
+        font-size: 1rem !important;
+    }
+
     section[data-testid="stSidebar"] div[data-testid="stButton"] button[kind="primary"]:hover {
-        background: linear-gradient(135deg, #1d4ed8, #0284c7) !important;
+        transform: translateY(-1px);
+        background: linear-gradient(135deg, #0f766e, #0284c7) !important;
     }
 
     section[data-testid="stSidebar"] form[data-testid="stForm"] button {
-        background: linear-gradient(135deg, #16a34a, #22c55e) !important;
+        background: linear-gradient(135deg, #fb7185, #f59e0b) !important;
         color: white !important;
         border: none !important;
         box-shadow: none !important;
     }
 
     section[data-testid="stSidebar"] form[data-testid="stForm"] button:hover {
-        background: linear-gradient(135deg, #15803d, #16a34a) !important;
+        background: linear-gradient(135deg, #e11d48, #d97706) !important;
         color: white !important;
     }
 
     section[data-testid="stSidebar"] div[data-testid="stButton"] button[kind="secondary"] {
         background: transparent !important;
-        color: #94a3b8 !important;
+        color: #a0b7b1 !important;
         border: none !important;
         box-shadow: none !important;
-        padding: 0.15rem 0.35rem !important;
-        min-height: 1.6rem !important;
+        min-height: 1.8rem !important;
     }
 
     section[data-testid="stSidebar"] div[data-testid="stButton"] button[kind="secondary"]:hover {
-        background: rgba(239, 68, 68, 0.08) !important;
-        color: #f87171 !important;
+        background: rgba(239, 68, 68, 0.10) !important;
+        color: #fecaca !important;
     }
 
     div[data-testid="stButton"] button[kind="primary"] {
-        border-radius: 12px !important;
+        border-radius: 14px !important;
         font-weight: 800 !important;
-        background: linear-gradient(135deg, #2563eb, #7c3aed) !important;
+        background: linear-gradient(135deg, #14b8a6, #0ea5e9) !important;
         border: none !important;
-        box-shadow: 0 10px 26px rgba(59,130,246,0.24) !important;
+        box-shadow: 0 12px 26px rgba(20, 184, 166, 0.18) !important;
     }
 
     div[data-testid="stButton"] button[kind="primary"]:hover {
-        background: linear-gradient(135deg, #1d4ed8, #6d28d9) !important;
+        background: linear-gradient(135deg, #0f766e, #0284c7) !important;
     }
 
-    div[data-testid="stButton"]:not(section[data-testid="stSidebar"] div[data-testid="stButton"]) button {
-        border-radius: 12px !important;
+    div[data-baseweb="input"] input,
+    div[data-baseweb="select"] > div {
+        border-radius: 14px !important;
+    }
+
+    div[data-baseweb="input"] input {
+        background: rgba(9, 24, 32, 0.76) !important;
     }
 
     div[data-testid="stAlert"] {
-        border-radius: 14px;
-    }
-
-    [data-testid="stPopover"] button {
-        border-radius: 12px !important;
-        border: 1px solid rgba(148,163,184,0.16) !important;
-        background: linear-gradient(135deg, rgba(15,23,42,0.96), rgba(17,24,39,0.96)) !important;
-        color: #e5edf7 !important;
-        font-weight: 700 !important;
+        border-radius: 16px;
     }
 
     [data-testid="stCaptionContainer"] {
-        color: #9fb0c8 !important;
+        color: var(--text-muted) !important;
     }
 
-    .table-context {
-        color: #9fb0c8;
-        font-size: 0.9rem;
-        margin-top: -0.3rem;
-        margin-bottom: 0.75rem;
-        line-height: 1.5;
+    [data-testid="stPopover"] button {
+        border-radius: 14px !important;
+        border: 1px solid rgba(129, 230, 217, 0.16) !important;
+        background: rgba(10, 23, 31, 0.88) !important;
+        color: #e7f5ef !important;
+        font-weight: 700 !important;
     }
 
     .deep-dive-grid-gap {
-        height: 0.7rem;
+        height: 0.8rem;
     }
 
-    .analysis-note {
-        color: #9fb0c8;
-        font-size: 0.92rem;
-        line-height: 1.55;
-        margin-top: 0.2rem;
-        margin-bottom: 0.9rem;
-    }
-
-    .status-box {
-        background: linear-gradient(135deg, rgba(15,23,42,0.96), rgba(19,30,50,0.92));
-        border: 1px solid rgba(148,163,184,0.12);
-        border-radius: 18px;
-        padding: 0.9rem 0.95rem;
-        min-height: 118px;
-        margin-bottom: 0.25rem;
-        box-shadow: 0 10px 24px rgba(0,0,0,0.12);
-    }
-
-    .status-label {
-        font-size: 0.78rem;
-        letter-spacing: 0.04em;
-        text-transform: uppercase;
-        color: #93a7c2;
-        font-weight: 800;
-        margin-bottom: 0.5rem;
-    }
-
-    .status-value {
-        font-size: 1.05rem;
-        line-height: 1.4;
-        font-weight: 800;
-    }
-
+    .status-box,
     .metric-tile {
-        background: linear-gradient(135deg, rgba(15,23,42,0.95), rgba(17,24,39,0.93));
-        border: 1px solid rgba(148,163,184,0.12);
-        border-radius: 18px;
+        border-radius: 20px;
         padding: 0.95rem 1rem;
-        min-height: 124px;
-        margin-bottom: 0.25rem;
-        box-shadow: 0 10px 24px rgba(0,0,0,0.12);
+        min-height: 112px;
     }
 
-    .metric-title {
-        color: #93a7c2;
-        font-size: 0.8rem;
-        font-weight: 800;
-        letter-spacing: 0.04em;
-        text-transform: uppercase;
+    .status-label,
+    .metric-title,
+    .decision-label {
+        color: #8fb4ac;
         margin-bottom: 0.42rem;
     }
 
-    .metric-value {
-        color: #f8fafc;
-        font-size: 1.18rem;
+    .status-value {
+        font-size: 1.02rem;
+        line-height: 1.42;
         font-weight: 800;
-        line-height: 1.35;
+    }
+
+    .metric-value {
+        color: var(--text-main);
+        font-size: 1.16rem;
+        font-weight: 800;
+        line-height: 1.32;
     }
 
     .metric-subtitle {
-        color: #9fb0c8;
-        font-size: 0.84rem;
-        line-height: 1.45;
-        margin-top: 0.42rem;
-    }
-
-    .queue-shell {
-        background: linear-gradient(135deg, rgba(15,23,42,0.94), rgba(17,24,39,0.92));
-        border: 1px solid rgba(148,163,184,0.12);
-        border-radius: 20px;
-        padding: 1rem 1.05rem;
-        box-shadow: 0 10px 28px rgba(0,0,0,0.14);
-        margin-bottom: 1rem;
-    }
-
-    .sidebar-status-shell {
-        background: linear-gradient(135deg, rgba(13,20,36,0.98), rgba(18,28,46,0.98));
-        border: 1px solid rgba(148,163,184,0.12);
-        border-radius: 16px;
-        padding: 0.9rem 0.95rem;
-        margin-bottom: 0.85rem;
+        color: var(--text-muted);
+        font-size: 0.83rem;
+        line-height: 1.48;
+        margin-top: 0.38rem;
     }
 
     .sidebar-list-row {
-        background: rgba(15,23,42,0.72);
-        border: 1px solid rgba(148,163,184,0.08);
-        border-radius: 12px;
-        padding: 0.5rem 0.7rem;
+        background: rgba(13, 30, 39, 0.84);
+        border: 1px solid rgba(129, 230, 217, 0.08);
+        border-radius: 14px;
+        padding: 0.55rem 0.75rem;
         min-height: 42px;
         display: flex;
         align-items: center;
-        color: #d9e4f2;
-        font-size: 0.92rem;
+        color: #e2f1eb;
+        font-size: 0.9rem;
         font-weight: 700;
     }
 
     .sidebar-list-row-selected {
-        background: linear-gradient(135deg, rgba(29,78,216,0.20), rgba(14,165,233,0.12));
-        border-color: rgba(96,165,250,0.28);
-        color: #f8fbff;
-        box-shadow: inset 0 1px 0 rgba(255,255,255,0.03);
-    }
-
-    .decision-card {
-        background: linear-gradient(135deg, rgba(15,23,42,0.95), rgba(17,24,39,0.92));
-        border-radius: 20px;
-        border: 1px solid rgba(148,163,184,0.12);
-        padding: 1rem 1.05rem;
-        margin-bottom: 0.9rem;
-        box-shadow: 0 10px 28px rgba(0,0,0,0.14);
-    }
-
-    .decision-label {
-        font-size: 0.78rem;
-        color: #93a7c2;
-        letter-spacing: 0.06em;
-        text-transform: uppercase;
-        font-weight: 800;
-        margin-bottom: 0.45rem;
+        background: linear-gradient(135deg, rgba(45, 212, 191, 0.16), rgba(96, 165, 250, 0.10));
+        border-color: rgba(129, 230, 217, 0.28);
+        color: #fbfffd;
     }
 
     .decision-title {
         font-size: 1.06rem;
         font-weight: 800;
-        line-height: 1.4;
-    }
-
-    .decision-body {
-        margin-top: 0.45rem;
-        color: #d6e1ef;
-        line-height: 1.65;
-        font-size: 0.94rem;
+        line-height: 1.42;
     }
 
     .insight-card {
-        background: rgba(15,23,42,0.72);
-        border: 1px solid rgba(148,163,184,0.10);
-        border-radius: 16px;
-        padding: 0.85rem 0.95rem;
-        margin-bottom: 0.6rem;
-        color: #dbe5f3;
-        line-height: 1.6;
-    }
-
-    .reason-group-card {
-        background: linear-gradient(135deg, rgba(15,23,42,0.92), rgba(17,24,39,0.88));
-        border: 1px solid rgba(148,163,184,0.10);
+        background: rgba(12, 28, 37, 0.74);
+        border: 1px solid rgba(129, 230, 217, 0.10);
         border-radius: 18px;
-        padding: 0.95rem 1rem;
-        margin-bottom: 0.75rem;
-    }
-
-    .reason-group-title {
-        font-size: 0.86rem;
-        letter-spacing: 0.06em;
-        text-transform: uppercase;
-        color: #d8e4f4;
-        font-weight: 800;
-        margin-bottom: 0.55rem;
+        padding: 0.85rem 0.95rem;
+        margin-bottom: 0.58rem;
+        color: #e2efea;
+        line-height: 1.62;
     }
 
     .reason-bullet {
-        color: #d5dfed;
-        line-height: 1.6;
-        margin-bottom: 0.45rem;
-        font-size: 0.93rem;
+        color: #dce9e5;
+        line-height: 1.58;
+        margin-bottom: 0.4rem;
+        font-size: 0.92rem;
     }
 
     .reason-bullet:last-child {
         margin-bottom: 0;
     }
 
-    .guide-panel {
-        background: linear-gradient(135deg, rgba(15,23,42,0.92), rgba(17,24,39,0.88));
-        border: 1px solid rgba(148,163,184,0.12);
-        border-radius: 18px;
-        padding: 1rem 1.05rem;
-        margin-bottom: 1rem;
-    }
+    @media (max-width: 900px) {
+        .block-container {
+            padding-top: 1.35rem;
+        }
 
-    .guide-block-title {
-        color: #f8fafc;
-        font-size: 1rem;
-        font-weight: 800;
-        margin-bottom: 0.35rem;
-    }
+        .hero-title {
+            font-size: 2.25rem;
+        }
 
-    .guide-block-copy {
-        color: #cbd5e1;
-        font-size: 0.93rem;
-        line-height: 1.6;
+        .hero-shell,
+        .run-panel,
+        .section-card,
+        .watchlist-card,
+        .queue-shell,
+        .decision-card,
+        .reason-group-card,
+        .guide-panel,
+        .empty-state,
+        .workspace-strip {
+            border-radius: 20px;
+        }
     }
 </style>
 """, unsafe_allow_html=True)
@@ -1948,7 +1885,7 @@ with st.sidebar:
         """
         <div class="sidebar-kicker">Control Center</div>
         <div class="sidebar-title">Scan And Manage</div>
-        <div class="sidebar-copy">Filter the dashboard, manage your watchlist, and rerun the full analysis from one place.</div>
+        <div class="sidebar-copy">Keep the watchlist current, choose the signal view, and rerun the model when price action changes.</div>
         """,
         unsafe_allow_html=True,
     )
@@ -1968,8 +1905,8 @@ with st.sidebar:
 
     filter_panel = st.container(border=True)
     with filter_panel:
-        st.markdown("### Filter View")
-        st.caption("Choose which signal tier should drive the ranking and deep-dive selection.")
+        st.markdown("### Signal Focus")
+        st.caption("Limit the ranking and deep dive to one label tier when you want a faster read.")
         signal_filter = st.selectbox(
             "Signal Filter",
             [
@@ -2027,7 +1964,7 @@ with st.sidebar:
 
     with watchlist_container:
         st.markdown("### Current Watchlist")
-        st.caption("Click the x to remove a name. The selected name becomes the default deep-dive stock.")
+        st.caption("Remove names with the x. The selected name becomes the default deep-dive symbol.")
         if st.session_state.watchlist:
             for ticker in st.session_state.watchlist:
                 row_col1, row_col2 = st.columns([6.2, 0.8])
@@ -2065,17 +2002,25 @@ with st.sidebar:
     with tip_panel:
         st.markdown("### Workflow Tip")
         st.markdown(
-            "<div class='sidebar-tip'>Run analysis after updating the watchlist, then use the ranked view to sort candidates before opening the stock deep dive.</div>",
+            "<div class='sidebar-tip'>Start with the trade queue, confirm whether anything is actually near support, then open the deep dive only for the names that still look actionable.</div>",
             unsafe_allow_html=True
         )
 
     sidebar_run_analysis = st.button("Run Analysis", use_container_width=True, type="primary")
-    st.caption("Refresh the watchlist ranking and deep-dive data.")
+    st.caption("Refresh the ranking, backtest summary, and deep-dive data.")
 
 if sidebar_run_analysis:
     run_full_analysis()
 
-hero_left, hero_right = st.columns([5.7, 1.45], vertical_alignment="center", gap="medium")
+analysis_status_text = "Analysis Ready" if st.session_state.analysis_ready else "Needs Refresh"
+analysis_status_color = "#22c55e" if st.session_state.analysis_ready else "#f59e0b"
+analysis_status_note = (
+    "The latest scoring snapshot is loaded for this watchlist."
+    if st.session_state.analysis_ready
+    else "Run analysis from the sidebar to populate the trade queue, ranking, and deep dive."
+)
+
+hero_left, hero_right = st.columns([5.2, 1.8], vertical_alignment="center", gap="large")
 
 with hero_left:
     st.markdown(
@@ -2083,7 +2028,7 @@ with hero_left:
         <div class='hero-shell'>
             <div class='hero-kicker'>Cash-Secured Put Workflow</div>
             <div class='hero-title'>Put Selling Dashboard</div>
-            <div class='hero-subtitle'>Screen watchlist names, separate live put-sale setups from stalk-list names, and keep the support-and-bounce decision process easy to read.</div>
+            <div class='hero-subtitle'>A cleaner workspace for deciding whether a stock is ready for a cash-secured put now, worth stalking for later, or not attractive enough to touch.</div>
             <div>
                 <span class='summary-chip'>Watchlist: {len(st.session_state.watchlist)} ticker(s)</span>
                 <span class='summary-chip'>Filter: {signal_filter}</span>
@@ -2096,41 +2041,28 @@ with hero_left:
 
 with hero_right:
     st.markdown(
-        """
-        <div class='section-card' style='margin-top:0.15rem;'>
-            <div class='section-eyebrow'>Refresh</div>
-            <div style='color:#dbe6f4; font-size:0.94rem; line-height:1.55; margin-bottom:0.7rem;'>
-                Re-run the screen after watchlist changes or after the market moves.
-            </div>
+        f"""
+        <div class='run-panel'>
+            <div class='section-eyebrow'>Workspace Status</div>
+            <div class='run-panel-title'>Session State</div>
+            <div class='run-panel-value' style='color:{analysis_status_color};'>{analysis_status_text}</div>
+            <div class='run-panel-copy'>{analysis_status_note}</div>
         </div>
         """,
         unsafe_allow_html=True,
     )
-    hero_run_analysis = st.button(
-        "🚀 Run Analysis",
-        key="hero_run_analysis",
-        use_container_width=True,
-        type="primary"
-    )
-    st.caption("Run or refresh the full watchlist analysis.")
-
-if hero_run_analysis:
-    run_full_analysis()
 
 st.markdown(
-    "<div class='hero-note'>Tip: start with the trade queue, then open the deep dive only for names that already look close to support or are beginning to bounce. Charts default to the last 3 months.</div>",
+    "<div class='hero-note'>Start by checking whether anything is actually in a disciplined support area. If not, use the stalk list instead of forcing a trade.</div>",
     unsafe_allow_html=True
 )
 
-render_section_header(
-    "Current Watchlist",
-    "These are the names currently being scanned whenever you run the full dashboard analysis.",
-    "Workspace",
-)
 if st.session_state.watchlist:
     st.markdown(
         f"""
-        <div class='watchlist-card'>
+        <div class='workspace-strip'>
+            <div class='workspace-strip-title'>Active Watchlist</div>
+            <div class='workspace-strip-copy'>These are the symbols included every time the dashboard refreshes its scoring and backtest loop.</div>
             {render_pills(st.session_state.watchlist)}
         </div>
         """,
@@ -2196,99 +2128,127 @@ if st.session_state.analysis_ready and st.session_state.analysis_df is not None:
         clean_df["label"].isin(["Downtrend Risk", "Breakdown Risk"])
     ].sort_values(["score", "confidence"], ascending=[True, True]).head(5)
 
+    if not qualified_put_sells.empty:
+        queue_title = f"{len(qualified_put_sells)} name(s) are close enough to support to review for a live put-selling decision."
+        queue_color = "#22c55e"
+    elif not stalk_names.empty:
+        queue_title = "Nothing looks trade-ready right now, but there are names worth stalking for a cleaner pullback or bounce."
+        queue_color = "#facc15"
+    else:
+        queue_title = "This screen is mostly defensive right now. Avoid forcing put sales until price behavior improves."
+        queue_color = "#ef4444"
+
+    render_section_header(
+        "Session Snapshot",
+        "Read the broad state first, then move into the actual trade queue.",
+        "Overview",
+    )
+
+    o1, o2, o3, o4, o5, o6 = st.columns(6, gap="medium")
+    o1.metric("High Conviction", counts["High Probability Put Sell"])
+    o2.metric("Candidates", counts["Put Sell Candidate"])
+    o3.metric("Stalk", counts["Stalk / Watchlist"])
+    o4.metric("Neutral", counts["Neutral / Wait"])
+    o5.metric("Downtrend Risk", counts["Downtrend Risk"])
+    o6.metric("Breakdown Risk", counts["Breakdown Risk"])
+
+    st.markdown(
+        f"""
+        <div class='queue-shell'>
+            <div style='display:flex; justify-content:space-between; align-items:flex-start; gap:1rem; flex-wrap:wrap;'>
+                <div>
+                    <div class='section-eyebrow'>Market Backdrop</div>
+                    <div style='font-size:1.15rem; font-weight:800; color:{regime_hex}; margin-bottom:0.28rem;'>
+                        {market_regime} Regime
+                    </div>
+                    <div style='color:#dce7e3; line-height:1.6; max-width:52rem;'>
+                        {regime_note}
+                    </div>
+                </div>
+                <div style='display:flex; flex-wrap:wrap; gap:0.45rem;'>
+                    <span class='summary-chip'>SPY Close: {fmt_price(spy_close)}</span>
+                    <span class='summary-chip'>SPY vs 200 SMA: {f"{spy_dist:.2f}%" if spy_dist is not None and not pd.isna(spy_dist) else "N/A"}</span>
+                </div>
+            </div>
+            <div style='margin-top:0.8rem; padding-top:0.8rem; border-top:1px solid rgba(129,230,217,0.10);'>
+                <div class='section-eyebrow'>What To Do Next</div>
+                <div style='font-size:1rem; font-weight:800; color:{queue_color}; margin-bottom:0.2rem;'>
+                    {queue_title}
+                </div>
+                <div style='color:#96ada7; line-height:1.55;'>
+                    Use the trade queue to separate live setups from names that only deserve monitoring.
+                </div>
+            </div>
+        </div>
+        """,
+        unsafe_allow_html=True,
+    )
+
     trade_queue_tab, ranking_tab, deep_dive_tab, backtest_tab, guide_tab = st.tabs(
-        ["Trade Queue", "Full Ranking", "Stock Deep Dive", "Auto Backtest", "Guide"]
+        ["Trade Queue", "Watchlist Table", "Deep Dive", "Backtest", "Guide"]
     )
 
     with trade_queue_tab:
         render_section_header(
             "Trade Queue",
-            "Start with the broad backdrop, then review the short list of setups that are closest to an actual put-selling decision.",
+            "This is the working board: review live setups first, then the stalk list, then the avoid list.",
             "Workflow",
         )
         st.markdown(
-            "<div class='analysis-note'>Work left to right: confirm the market backdrop, scan the stronger setups, then avoid forcing anything that still looks pressured or structurally weak.</div>",
+            "<div class='analysis-note'>A clean put sale usually needs two things at the same time: a stock you would still be okay owning and timing that is actually close enough to support to matter.</div>",
             unsafe_allow_html=True,
         )
 
-        c1, c2, c3, c4, c5, c6 = st.columns(6, gap="medium")
-        c1.metric("High Conviction", counts["High Probability Put Sell"])
-        c2.metric("Candidates", counts["Put Sell Candidate"])
-        c3.metric("Stalk", counts["Stalk / Watchlist"])
-        c4.metric("Neutral", counts["Neutral / Wait"])
-        c5.metric("Downtrend Risk", counts["Downtrend Risk"])
-        c6.metric("Breakdown Risk", counts["Breakdown Risk"])
-
-        st.markdown(
-            f"""
-            <div class='queue-shell'>
-                <div style='display:flex; justify-content:space-between; align-items:center; gap:1rem; flex-wrap:wrap;'>
-                    <div style='font-size:1.15rem; font-weight:800; color:{regime_hex};'>
-                        Market Regime: {market_regime}
-                    </div>
-                    <div style='color:#d6e0ee; font-size:0.98rem;'>
-                        SPY Close: <b>{fmt_price(spy_close)}</b> &nbsp; | &nbsp;
-                        SPY Dist to 200 SMA: <b>{f"{spy_dist:.2f}%" if spy_dist is not None and not pd.isna(spy_dist) else "N/A"}</b>
-                    </div>
-                </div>
-                <div style='margin-top:0.55rem; color:#9fb0c8; line-height:1.6;'>
-                    {regime_note}
-                </div>
-            </div>
-            """,
-            unsafe_allow_html=True
+        render_section_header(
+            "Ready Now",
+            "These are the names closest to a live put-selling decision right now.",
+            "Priority",
         )
-
-        left, right = st.columns([1.3, 1], gap="large")
-
-        with left:
-            render_section_header(
-                "Actionable Setups",
-                "These are the names closest to an actual put-selling decision right now.",
-                "Short List",
+        if not qualified_put_sells.empty:
+            st.markdown(
+                "<div class='table-context'>Read left to right: stock, support, preferred entry, setup state, then conviction.</div>",
+                unsafe_allow_html=True,
             )
-            if not qualified_put_sells.empty:
-                st.markdown(
-                    "<div class='table-context'>Read each row left to right: stock, nearby support, preferred entry, then entry readiness and conviction.</div>",
-                    unsafe_allow_html=True,
-                )
-                left_display = prepare_display_table(
-                    build_ranked_display_df(qualified_put_sells),
-                    [
-                        "symbol",
-                        "price",
-                        "primary_support",
-                        "recommended_entry",
-                        "entry_status",
-                        "support_strength_label",
-                        "bounce_signal",
-                        "label",
-                        "score",
-                        "confidence",
-                        "setup_note",
-                    ],
-                )
-                st.dataframe(
-                    style_ranked_table(left_display),
-                    use_container_width=True,
-                    hide_index=True
-                )
-            else:
-                st.markdown(
-                    "<div class='soft-danger-text'>No stocks currently qualify as trade-ready put setups. Use the stalk list below instead of forcing an entry.</div>",
-                    unsafe_allow_html=True
-                )
+            ready_display = prepare_display_table(
+                build_ranked_display_df(qualified_put_sells),
+                [
+                    "symbol",
+                    "price",
+                    "primary_support",
+                    "recommended_entry",
+                    "entry_status",
+                    "support_strength_label",
+                    "bounce_signal",
+                    "label",
+                    "score",
+                    "confidence",
+                    "setup_note",
+                ],
+            )
+            st.dataframe(
+                style_ranked_table(ready_display),
+                use_container_width=True,
+                hide_index=True
+            )
+        else:
+            st.markdown(
+                "<div class='soft-danger-text'>No stocks currently qualify as trade-ready put setups. Use the stalk list below instead of forcing an entry.</div>",
+                unsafe_allow_html=True
+            )
 
+        stalk_col, avoid_col = st.columns([1.15, 0.95], gap="large")
+
+        with stalk_col:
             render_section_header(
                 "Worth Stalking",
-                "These names may still be worth owning on assignment, but the timing is not ready enough yet for a disciplined put sale.",
+                "These names may still be acceptable on assignment, but the entry timing is not ready enough yet.",
                 "Pipeline",
             )
             if stalk_names.empty:
                 st.info("No stalk-list names are standing out right now.")
             else:
                 st.markdown(
-                    "<div class='table-context'>These are better treated as monitored names than immediate trades. Wait for a cleaner pullback, support test, or bounce confirmation.</div>",
+                    "<div class='table-context'>These belong on the monitor list until price reaches support more cleanly or the bounce improves.</div>",
                     unsafe_allow_html=True,
                 )
                 stalk_display = prepare_display_table(
@@ -2313,17 +2273,17 @@ if st.session_state.analysis_ready and st.session_state.analysis_df is not None:
                     hide_index=True,
                 )
 
-        with right:
+        with avoid_col:
             render_section_header(
-                "Avoid / Higher Risk",
-                "These names are not lining up well enough for a fresh put sale right now.",
+                "Avoid For Now",
+                "These names are still too pressured or structurally weak for fresh put exposure.",
                 "Risk Review",
             )
             if avoid_names.empty:
                 st.info("No high-risk names found.")
             else:
                 st.markdown(
-                    "<div class='table-context'>This table emphasizes the structural reasons the setup is less attractive for put sellers.</div>",
+                    "<div class='table-context'>This table focuses on the specific reasons the setup is less dependable for put sellers.</div>",
                     unsafe_allow_html=True,
                 )
                 right_display = prepare_display_table(
@@ -2356,8 +2316,8 @@ if st.session_state.analysis_ready and st.session_state.analysis_df is not None:
 
     with ranking_tab:
         render_section_header(
-            "Ranked Watchlist",
-            "This is the full filtered ranking. The best trade-ready labels stay on top, then the stalk list, then the wait-or-avoid names.",
+            "Full Watchlist Table",
+            "This is the full filtered ranking. Trade-ready names stay on top, then stalk names, then the more defensive labels.",
             "Ranking",
         )
         st.markdown(
@@ -2394,7 +2354,7 @@ if st.session_state.analysis_ready and st.session_state.analysis_df is not None:
     with deep_dive_tab:
         render_section_header(
             "Stock Deep Dive",
-            "Select one stock to inspect its support map, bounce behavior, chart context, and the dashboard's suggested next move.",
+            "Inspect one symbol at a time: support map first, bounce behavior second, then confirm with the charts.",
             "Deep Dive",
         )
         selection_col, helper_col = st.columns([2.2, 1], gap="medium")
@@ -2411,7 +2371,7 @@ if st.session_state.analysis_ready and st.session_state.analysis_df is not None:
                 <div class='guide-panel' style='margin-bottom:0;'>
                     <div class='guide-block-title'>How To Use This View</div>
                     <div class='guide-block-copy'>
-                        Confirm the support map first, then look at the bounce behavior, and only then use the indicators as confirmation.
+                        Start with support and entry status. If that part is weak, the indicators usually should not rescue the trade idea.
                     </div>
                 </div>
                 """,
