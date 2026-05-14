@@ -29,7 +29,7 @@ from src.watchlist_manager import (
 )
 
 st.set_page_config(
-    page_title="Put Selling Dashboard",
+    page_title="Quantitative Put Selling Dashboard",
     page_icon="📈",
     layout="wide"
 )
@@ -58,6 +58,17 @@ st.markdown("""
         font-family: "Manrope", sans-serif;
     }
 
+    header[data-testid="stHeader"],
+    [data-testid="stToolbar"],
+    [data-testid="stDecoration"],
+    [data-testid="stStatusWidget"],
+    #MainMenu,
+    footer {
+        display: none !important;
+        visibility: hidden !important;
+        height: 0 !important;
+    }
+
     .stApp {
         background:
             radial-gradient(circle at 0% 0%, rgba(45, 212, 191, 0.11), transparent 24%),
@@ -67,9 +78,17 @@ st.markdown("""
     }
 
     .block-container {
-        padding-top: 2rem;
-        padding-bottom: 2.85rem;
+        padding-top: 1.05rem;
+        padding-bottom: 3.25rem;
         max-width: 1480px;
+    }
+
+    div[data-testid="stVerticalBlock"] {
+        gap: 0.9rem;
+    }
+
+    div[data-testid="stHorizontalBlock"] {
+        gap: 1.15rem;
     }
 
     h1, h2, h3, h4, .hero-title, .section-title {
@@ -116,8 +135,8 @@ st.markdown("""
 
     .desk-header {
         border-radius: 26px;
-        padding: 1.15rem 1.25rem;
-        margin-bottom: 0.75rem;
+        padding: 1.25rem 1.35rem;
+        margin-bottom: 1rem;
         position: relative;
         overflow: hidden;
     }
@@ -193,22 +212,22 @@ st.markdown("""
 
     .workflow-strip {
         border-radius: 22px;
-        padding: 0.78rem;
-        margin-bottom: 0.85rem;
+        padding: 0.9rem;
+        margin-bottom: 1.15rem;
     }
 
     .workflow-grid {
         display: grid;
         grid-template-columns: repeat(4, minmax(0, 1fr));
-        gap: 0.55rem;
+        gap: 0.75rem;
     }
 
     .workflow-step {
         border-radius: 16px;
-        padding: 0.72rem 0.78rem;
+        padding: 0.82rem 0.9rem;
         background: rgba(7, 19, 26, 0.42);
         border: 1px solid rgba(129, 230, 217, 0.09);
-        min-height: 94px;
+        min-height: 102px;
     }
 
     .workflow-step-active {
@@ -369,8 +388,8 @@ st.markdown("""
 
     .ticker-rail {
         border-radius: 22px;
-        padding: 0.8rem 0.95rem;
-        margin-bottom: 0.9rem;
+        padding: 0.92rem 1.05rem;
+        margin-bottom: 1.2rem;
     }
 
     .ticker-rail-top {
@@ -396,21 +415,21 @@ st.markdown("""
 
     .operator-board {
         border-radius: 26px;
-        padding: 1rem;
-        margin-bottom: 1rem;
+        padding: 1.1rem;
+        margin-bottom: 1.25rem;
     }
 
     .operator-grid {
         display: grid;
         grid-template-columns: minmax(260px, 0.9fr) minmax(360px, 1.8fr);
-        gap: 0.85rem;
+        gap: 1rem;
         align-items: stretch;
     }
 
     .market-cardlet,
     .priority-card {
         border-radius: 20px;
-        padding: 0.95rem 1rem;
+        padding: 1.05rem 1.08rem;
         box-shadow: none;
     }
 
@@ -432,8 +451,8 @@ st.markdown("""
     .signal-count-grid {
         display: grid;
         grid-template-columns: repeat(3, minmax(0, 1fr));
-        gap: 0.55rem;
-        margin-bottom: 0.75rem;
+        gap: 0.72rem;
+        margin-bottom: 0.92rem;
     }
 
     .signal-count-tile {
@@ -484,12 +503,12 @@ st.markdown("""
     .empty-state {
         border-radius: 22px;
         padding: 1.05rem 1.12rem;
-        margin-bottom: 1rem;
+        margin-bottom: 1.2rem;
     }
 
     .section-header {
-        margin-top: 0.2rem;
-        margin-bottom: 0.7rem;
+        margin-top: 0.45rem;
+        margin-bottom: 0.92rem;
     }
 
     .section-title {
@@ -575,6 +594,7 @@ st.markdown("""
         overflow: hidden;
         border: 1px solid rgba(129, 230, 217, 0.10);
         box-shadow: 0 10px 26px rgba(0, 0, 0, 0.14);
+        margin-bottom: 1rem;
     }
 
     div[data-testid="stVerticalBlockBorderWrapper"] {
@@ -582,15 +602,16 @@ st.markdown("""
         border: 1px solid rgba(129, 230, 217, 0.10) !important;
         background: linear-gradient(180deg, rgba(10, 23, 31, 0.76), rgba(10, 23, 31, 0.68));
         box-shadow: 0 8px 22px rgba(0, 0, 0, 0.10);
+        margin-bottom: 0.8rem;
     }
 
     div[data-testid="stTabs"] {
-        margin-top: 0.15rem;
+        margin-top: 0.45rem;
     }
 
     div[data-testid="stTabs"] [data-baseweb="tab-list"] {
         gap: 0.45rem;
-        padding-bottom: 0.35rem;
+        padding-bottom: 0.7rem;
     }
 
     div[data-testid="stTabs"] button {
@@ -616,7 +637,7 @@ st.markdown("""
     }
 
     section[data-testid="stSidebar"] .block-container {
-        padding-top: 1.25rem;
+        padding-top: 1rem;
         padding-bottom: 1.35rem;
     }
 
@@ -703,7 +724,7 @@ st.markdown("""
     }
 
     .deep-dive-grid-gap {
-        height: 0.8rem;
+        height: 1rem;
     }
 
     .status-box,
@@ -769,8 +790,8 @@ st.markdown("""
         background: rgba(12, 28, 37, 0.74);
         border: 1px solid rgba(129, 230, 217, 0.10);
         border-radius: 18px;
-        padding: 0.85rem 0.95rem;
-        margin-bottom: 0.58rem;
+        padding: 0.92rem 1rem;
+        margin-bottom: 0.75rem;
         color: #e2efea;
         line-height: 1.62;
     }
@@ -788,7 +809,7 @@ st.markdown("""
 
     @media (max-width: 900px) {
         .block-container {
-            padding-top: 1.35rem;
+            padding-top: 0.95rem;
         }
 
         .hero-title {
@@ -2361,7 +2382,7 @@ desk_header_html = (
     "<div class='desk-header-top'>"
     "<div>"
     "<div class='hero-kicker'>Cash-Secured Put Workflow</div>"
-    "<div class='desk-title'>Put Selling Desk</div>"
+    "<div class='desk-title'>Quantitative Put Selling Dashboard</div>"
     "<div class='desk-subtitle'>Scan the watchlist, find names near support, and decide whether the setup is worth selling a put or better left alone.</div>"
     "</div>"
     f"<div class='desk-status-pill' style='color:{analysis_status_color};'>{analysis_status_text}</div>"
