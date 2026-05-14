@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "generated_at": "2026-05-12T22:44:12+00:00",
+  "generated_at": "2026-05-13T15:07:17+00:00",
   "watchlist_signature": "4f13e332c770d0b9",
   "threshold_adjustments": {
     "candidate_min_score": 0,
@@ -16,9 +16,9 @@
     "No threshold adjustments were needed from the latest backtest cycle."
   ],
   "source_summary": {
-    "candidate_signal_count": 0,
-    "candidate_success_rate": null,
-    "high_probability_signal_count": 0,
-    "high_probability_success_rate": null
+    "candidate_signal_count": 184,
+    "candidate_success_rate": 64.11,
+    "high_probability_signal_count": 73,
+    "high_probability_success_rate": 63.0
   }
 }

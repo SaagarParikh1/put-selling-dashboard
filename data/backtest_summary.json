@@ -1,128 +1,193 @@
 {
   "version": 1,
-  "generated_at": "2026-05-12T22:44:12+00:00",
+  "generated_at": "2026-05-13T15:07:17+00:00",
   "watchlist_signature": "4f13e332c770d0b9",
   "watchlist_size": 8,
-  "candidate_like": null,
+  "candidate_like": {
+    "signal_count": 257,
+    "success_rate": 63.78,
+    "avg_20d_return_pct": 1.81,
+    "avg_max_drawdown_pct": -3.38
+  },
   "labels": {
     "Breakdown Risk": {
-      "signal_count": 523,
-      "success_rate": 26.01,
-      "support_hold_rate": 41.87,
-      "avg_5d_return_pct": 1.46,
-      "avg_10d_return_pct": 4.11,
-      "avg_20d_return_pct": 8.52,
-      "avg_max_drawdown_pct": -17.94,
-      "avg_max_runup_pct": 32.37,
-      "avg_score": -42.26
+      "signal_count": 509,
+      "success_rate": 26.14,
+      "support_hold_rate": 42.82,
+      "avg_5d_return_pct": 1.54,
+      "avg_10d_return_pct": 4.26,
+      "avg_20d_return_pct": 8.95,
+      "avg_max_drawdown_pct": -17.68,
+      "avg_max_runup_pct": 32.77,
+      "avg_score": -41.42
     },
     "Downtrend Risk": {
-      "signal_count": 463,
-      "success_rate": 21.59,
-      "support_hold_rate": 45.99,
-      "avg_5d_return_pct": -0.02,
-      "avg_10d_return_pct": -1.16,
-      "avg_20d_return_pct": -4.81,
-      "avg_max_drawdown_pct": -19.51,
-      "avg_max_runup_pct": 17.75,
-      "avg_score": -25.53
+      "signal_count": 471,
+      "success_rate": 21.26,
+      "support_hold_rate": 45.23,
+      "avg_5d_return_pct": 0.03,
+      "avg_10d_return_pct": -1.22,
+      "avg_20d_return_pct": -4.66,
+      "avg_max_drawdown_pct": -19.58,
+      "avg_max_runup_pct": 17.88,
+      "avg_score": -23.85
+    },
+    "High Probability Put Sell": {
+      "signal_count": 73,
+      "success_rate": 63.0,
+      "support_hold_rate": 75.3,
+      "avg_5d_return_pct": -0.13,
+      "avg_10d_return_pct": -0.06,
+      "avg_20d_return_pct": 0.58,
+      "avg_max_drawdown_pct": -2.72,
+      "avg_max_runup_pct": 2.03,
+      "avg_score": 35.55
     },
     "Neutral / Wait": {
-      "signal_count": 1117,
-      "success_rate": 47.46,
-      "support_hold_rate": 74.86,
-      "avg_5d_return_pct": 1.25,
-      "avg_10d_return_pct": 2.82,
-      "avg_20d_return_pct": 6.19,
-      "avg_max_drawdown_pct": -9.53,
-      "avg_max_runup_pct": 17.74,
-      "avg_score": 22.84
+      "signal_count": 409,
+      "success_rate": 28.83,
+      "support_hold_rate": 61.84,
+      "avg_5d_return_pct": 1.26,
+      "avg_10d_return_pct": 2.24,
+      "avg_20d_return_pct": 4.77,
+      "avg_max_drawdown_pct": -17.03,
+      "avg_max_runup_pct": 26.6,
+      "avg_score": 16.43
+    },
+    "Put Sell Candidate": {
+      "signal_count": 184,
+      "success_rate": 64.11,
+      "support_hold_rate": 73.87,
+      "avg_5d_return_pct": 0.25,
+      "avg_10d_return_pct": 0.8,
+      "avg_20d_return_pct": 2.3,
+      "avg_max_drawdown_pct": -3.63,
+      "avg_max_runup_pct": 5.4,
+      "avg_score": 32.62
+    },
+    "Stalk / Watchlist": {
+      "signal_count": 464,
+      "success_rate": 54.31,
+      "support_hold_rate": 86.24,
+      "avg_5d_return_pct": 1.84,
+      "avg_10d_return_pct": 4.41,
+      "avg_20d_return_pct": 9.33,
+      "avg_max_drawdown_pct": -6.75,
+      "avg_max_runup_pct": 17.31,
+      "avg_score": 26.52
     }
   },
   "symbols": [
     {
       "symbol": "SOFI",
-      "signal_count": 511,
+      "signal_count": 512,
       "labels": {
         "Breakdown Risk": {
-          "signal_count": 104,
-          "success_rate": 30.8,
+          "signal_count": 101,
+          "success_rate": 30.7,
           "support_hold_rate": 35.6,
-          "avg_5d_return_pct": 0.97,
-          "avg_10d_return_pct": 2.0,
-          "avg_20d_return_pct": 3.16,
-          "avg_max_drawdown_pct": -12.47,
-          "avg_max_runup_pct": 17.38,
-          "avg_score": -36.28
+          "avg_5d_return_pct": 1.14,
+          "avg_10d_return_pct": 2.37,
+          "avg_20d_return_pct": 3.5,
+          "avg_max_drawdown_pct": -12.32,
+          "avg_max_runup_pct": 17.68,
+          "avg_score": -35.13
         },
         "Downtrend Risk": {
-          "signal_count": 109,
-          "success_rate": 22.0,
-          "support_hold_rate": 33.9,
-          "avg_5d_return_pct": -0.47,
-          "avg_10d_return_pct": -1.78,
-          "avg_20d_return_pct": -2.87,
-          "avg_max_drawdown_pct": -11.95,
-          "avg_max_runup_pct": 10.21,
-          "avg_score": -23.75
+          "signal_count": 107,
+          "success_rate": 20.6,
+          "support_hold_rate": 32.7,
+          "avg_5d_return_pct": -0.52,
+          "avg_10d_return_pct": -2.07,
+          "avg_20d_return_pct": -2.88,
+          "avg_max_drawdown_pct": -12.11,
+          "avg_max_runup_pct": 10.11,
+          "avg_score": -22.93
         },
         "Neutral / Wait": {
-          "signal_count": 298,
-          "success_rate": 40.3,
-          "support_hold_rate": 77.9,
-          "avg_5d_return_pct": 1.99,
-          "avg_10d_return_pct": 4.16,
-          "avg_20d_return_pct": 8.07,
-          "avg_max_drawdown_pct": -9.68,
-          "avg_max_runup_pct": 19.48,
-          "avg_score": 21.15
+          "signal_count": 65,
+          "success_rate": 24.6,
+          "support_hold_rate": 55.4,
+          "avg_5d_return_pct": 0.8,
+          "avg_10d_return_pct": -0.57,
+          "avg_20d_return_pct": -6.6,
+          "avg_max_drawdown_pct": -13.55,
+          "avg_max_runup_pct": 11.75,
+          "avg_score": 13.12
+        },
+        "Put Sell Candidate": {
+          "signal_count": 16,
+          "success_rate": 50.0,
+          "support_hold_rate": 56.2,
+          "avg_5d_return_pct": 0.01,
+          "avg_10d_return_pct": 2.35,
+          "avg_20d_return_pct": 17.11,
+          "avg_max_drawdown_pct": -9.57,
+          "avg_max_runup_pct": 24.12,
+          "avg_score": 26.81
+        },
+        "Stalk / Watchlist": {
+          "signal_count": 223,
+          "success_rate": 44.4,
+          "support_hold_rate": 85.7,
+          "avg_5d_return_pct": 2.4,
+          "avg_10d_return_pct": 5.47,
+          "avg_20d_return_pct": 11.28,
+          "avg_max_drawdown_pct": -8.66,
+          "avg_max_runup_pct": 21.15,
+          "avg_score": 25.22
         }
       },
-      "candidate_like": null
+      "candidate_like": {
+        "signal_count": 16,
+        "success_rate": 50.0,
+        "avg_20d_return_pct": 17.11,
+        "avg_max_drawdown_pct": -9.57
+      }
     },
     {
       "symbol": "ROBN",
-      "signal_count": 81,
+      "signal_count": 82,
       "labels": {
         "Breakdown Risk": {
-          "signal_count": 63,
-          "success_rate": 7.9,
-          "support_hold_rate": 17.5,
-          "avg_5d_return_pct": -0.91,
-          "avg_10d_return_pct": -2.28,
-          "avg_20d_return_pct": -8.88,
-          "avg_max_drawdown_pct": -27.97,
-          "avg_max_runup_pct": 28.18,
-          "avg_score": -50.33
+          "signal_count": 62,
+          "success_rate": 8.1,
+          "support_hold_rate": 17.7,
+          "avg_5d_return_pct": -0.57,
+          "avg_10d_return_pct": -1.84,
+          "avg_20d_return_pct": -7.93,
+          "avg_max_drawdown_pct": -27.32,
+          "avg_max_runup_pct": 28.63,
+          "avg_score": -49.0
         },
         "Downtrend Risk": {
-          "signal_count": 18,
+          "signal_count": 20,
           "success_rate": 0.0,
-          "support_hold_rate": 5.6,
-          "avg_5d_return_pct": -12.21,
-          "avg_10d_return_pct": -22.07,
-          "avg_20d_return_pct": -42.09,
-          "avg_max_drawdown_pct": -49.5,
-          "avg_max_runup_pct": 8.46,
-          "avg_score": -36.94
+          "support_hold_rate": 10.0,
+          "avg_5d_return_pct": -12.03,
+          "avg_10d_return_pct": -23.15,
+          "avg_20d_return_pct": -42.61,
+          "avg_max_drawdown_pct": -49.92,
+          "avg_max_runup_pct": 8.29,
+          "avg_score": -32.5
         }
       },
       "candidate_like": null
     },
     {
       "symbol": "HIMZ",
-      "signal_count": 53,
+      "signal_count": 54,
       "labels": {
         "Breakdown Risk": {
-          "signal_count": 39,
-          "success_rate": 10.3,
-          "support_hold_rate": 53.8,
-          "avg_5d_return_pct": 0.76,
-          "avg_10d_return_pct": 12.93,
-          "avg_20d_return_pct": 32.2,
-          "avg_max_drawdown_pct": -32.07,
-          "avg_max_runup_pct": 105.71,
-          "avg_score": -58.85
+          "signal_count": 40,
+          "success_rate": 10.0,
+          "support_hold_rate": 55.0,
+          "avg_5d_return_pct": 1.68,
+          "avg_10d_return_pct": 12.88,
+          "avg_20d_return_pct": 31.01,
+          "avg_max_drawdown_pct": -31.73,
+          "avg_max_runup_pct": 104.71,
+          "avg_score": -57.62
         },
         "Downtrend Risk": {
           "signal_count": 14,
@@ -133,94 +198,121 @@
           "avg_20d_return_pct": 33.06,
           "avg_max_drawdown_pct": -22.84,
           "avg_max_runup_pct": 87.52,
-          "avg_score": -47.21
+          "avg_score": -45.21
         }
       },
       "candidate_like": null
     },
     {
       "symbol": "SMCX",
-      "signal_count": 192,
+      "signal_count": 193,
       "labels": {
         "Breakdown Risk": {
           "signal_count": 90,
           "success_rate": 18.9,
-          "support_hold_rate": 32.2,
-          "avg_5d_return_pct": -1.41,
-          "avg_10d_return_pct": -2.02,
-          "avg_20d_return_pct": 2.12,
-          "avg_max_drawdown_pct": -22.76,
-          "avg_max_runup_pct": 29.34,
-          "avg_score": -56.78
+          "support_hold_rate": 33.3,
+          "avg_5d_return_pct": -1.25,
+          "avg_10d_return_pct": -1.69,
+          "avg_20d_return_pct": 3.09,
+          "avg_max_drawdown_pct": -22.24,
+          "avg_max_runup_pct": 29.99,
+          "avg_score": -55.27
         },
         "Downtrend Risk": {
-          "signal_count": 90,
-          "success_rate": 10.0,
-          "support_hold_rate": 51.1,
-          "avg_5d_return_pct": -1.94,
-          "avg_10d_return_pct": -5.85,
-          "avg_20d_return_pct": -21.28,
-          "avg_max_drawdown_pct": -35.73,
-          "avg_max_runup_pct": 22.47,
-          "avg_score": -30.24
+          "signal_count": 86,
+          "success_rate": 10.5,
+          "support_hold_rate": 52.3,
+          "avg_5d_return_pct": -2.13,
+          "avg_10d_return_pct": -5.74,
+          "avg_20d_return_pct": -20.45,
+          "avg_max_drawdown_pct": -35.36,
+          "avg_max_runup_pct": 22.92,
+          "avg_score": -29.97
         },
         "Neutral / Wait": {
-          "signal_count": 12,
+          "signal_count": 17,
           "success_rate": 0.0,
-          "support_hold_rate": 8.3,
-          "avg_5d_return_pct": -21.47,
-          "avg_10d_return_pct": -35.8,
-          "avg_20d_return_pct": -48.46,
-          "avg_max_drawdown_pct": -52.94,
-          "avg_max_runup_pct": 6.57,
-          "avg_score": 7.67
+          "support_hold_rate": 11.8,
+          "avg_5d_return_pct": -14.77,
+          "avg_10d_return_pct": -29.52,
+          "avg_20d_return_pct": -47.06,
+          "avg_max_drawdown_pct": -51.41,
+          "avg_max_runup_pct": 7.88,
+          "avg_score": 7.35
         }
       },
       "candidate_like": null
     },
     {
       "symbol": "METU",
-      "signal_count": 244,
+      "signal_count": 245,
       "labels": {
         "Breakdown Risk": {
-          "signal_count": 58,
-          "success_rate": 43.1,
-          "support_hold_rate": 51.7,
-          "avg_5d_return_pct": 6.07,
-          "avg_10d_return_pct": 10.86,
-          "avg_20d_return_pct": 9.68,
-          "avg_max_drawdown_pct": -11.78,
-          "avg_max_runup_pct": 26.21,
-          "avg_score": -40.78
+          "signal_count": 53,
+          "success_rate": 47.2,
+          "support_hold_rate": 56.6,
+          "avg_5d_return_pct": 6.48,
+          "avg_10d_return_pct": 11.96,
+          "avg_20d_return_pct": 12.34,
+          "avg_max_drawdown_pct": -10.6,
+          "avg_max_runup_pct": 27.63,
+          "avg_score": -41.74
         },
         "Downtrend Risk": {
-          "signal_count": 80,
-          "success_rate": 10.0,
-          "support_hold_rate": 42.5,
-          "avg_5d_return_pct": -0.92,
-          "avg_10d_return_pct": -2.14,
-          "avg_20d_return_pct": -4.78,
-          "avg_max_drawdown_pct": -17.07,
-          "avg_max_runup_pct": 12.29,
-          "avg_score": -26.36
+          "signal_count": 91,
+          "success_rate": 8.8,
+          "support_hold_rate": 39.6,
+          "avg_5d_return_pct": -0.73,
+          "avg_10d_return_pct": -2.5,
+          "avg_20d_return_pct": -5.8,
+          "avg_max_drawdown_pct": -17.46,
+          "avg_max_runup_pct": 11.9,
+          "avg_score": -22.44
         },
         "Neutral / Wait": {
-          "signal_count": 106,
-          "success_rate": 23.6,
-          "support_hold_rate": 59.4,
-          "avg_5d_return_pct": -0.64,
-          "avg_10d_return_pct": -0.96,
-          "avg_20d_return_pct": -0.23,
-          "avg_max_drawdown_pct": -11.55,
-          "avg_max_runup_pct": 11.95,
-          "avg_score": 21.74
+          "signal_count": 44,
+          "success_rate": 20.5,
+          "support_hold_rate": 54.5,
+          "avg_5d_return_pct": -1.02,
+          "avg_10d_return_pct": -2.5,
+          "avg_20d_return_pct": -0.81,
+          "avg_max_drawdown_pct": -12.91,
+          "avg_max_runup_pct": 11.47,
+          "avg_score": 18.86
+        },
+        "Put Sell Candidate": {
+          "signal_count": 9,
+          "success_rate": 0.0,
+          "support_hold_rate": 11.1,
+          "avg_5d_return_pct": -2.06,
+          "avg_10d_return_pct": 3.7,
+          "avg_20d_return_pct": -3.48,
+          "avg_max_drawdown_pct": -12.68,
+          "avg_max_runup_pct": 11.69,
+          "avg_score": 34.33
+        },
+        "Stalk / Watchlist": {
+          "signal_count": 48,
+          "success_rate": 33.3,
+          "support_hold_rate": 77.1,
+          "avg_5d_return_pct": -0.05,
+          "avg_10d_return_pct": 0.54,
+          "avg_20d_return_pct": 1.57,
+          "avg_max_drawdown_pct": -9.67,
+          "avg_max_runup_pct": 12.89,
+          "avg_score": 24.98
         }
       },
-      "candidate_like": null
+      "candidate_like": {
+        "signal_count": 9,
+        "success_rate": 0.0,
+        "avg_20d_return_pct": -3.48,
+        "avg_max_drawdown_pct": -12.68
+      }
     },
     {
       "symbol": "SPY",
-      "signal_count": 511,
+      "signal_count": 512,
       "labels": {
         "Breakdown Risk": {
           "signal_count": 17,
@@ -231,76 +323,141 @@
           "avg_20d_return_pct": 5.27,
           "avg_max_drawdown_pct": -5.0,
           "avg_max_runup_pct": 8.08,
-          "avg_score": -25.59
+          "avg_score": -23.59
         },
         "Downtrend Risk": {
-          "signal_count": 57,
-          "success_rate": 52.6,
-          "support_hold_rate": 52.6,
-          "avg_5d_return_pct": 1.2,
-          "avg_10d_return_pct": 2.58,
-          "avg_20d_return_pct": 4.6,
-          "avg_max_drawdown_pct": -4.71,
-          "avg_max_runup_pct": 6.61,
-          "avg_score": -13.0
+          "signal_count": 56,
+          "success_rate": 53.6,
+          "support_hold_rate": 53.6,
+          "avg_5d_return_pct": 1.39,
+          "avg_10d_return_pct": 2.69,
+          "avg_20d_return_pct": 4.7,
+          "avg_max_drawdown_pct": -4.55,
+          "avg_max_runup_pct": 6.7,
+          "avg_score": -12.05
+        },
+        "High Probability Put Sell": {
+          "signal_count": 73,
+          "success_rate": 63.0,
+          "support_hold_rate": 75.3,
+          "avg_5d_return_pct": -0.13,
+          "avg_10d_return_pct": -0.06,
+          "avg_20d_return_pct": 0.58,
+          "avg_max_drawdown_pct": -2.72,
+          "avg_max_runup_pct": 2.03,
+          "avg_score": 35.55
         },
         "Neutral / Wait": {
-          "signal_count": 437,
-          "success_rate": 71.2,
-          "support_hold_rate": 79.9,
-          "avg_5d_return_pct": 0.18,
-          "avg_10d_return_pct": 0.29,
-          "avg_20d_return_pct": 0.86,
-          "avg_max_drawdown_pct": -2.62,
+          "signal_count": 55,
+          "success_rate": 63.6,
+          "support_hold_rate": 63.6,
+          "avg_5d_return_pct": -0.06,
+          "avg_10d_return_pct": 0.31,
+          "avg_20d_return_pct": 1.73,
+          "avg_max_drawdown_pct": -3.27,
+          "avg_max_runup_pct": 3.45,
+          "avg_score": 18.05
+        },
+        "Put Sell Candidate": {
+          "signal_count": 158,
+          "success_rate": 69.6,
+          "support_hold_rate": 79.7,
+          "avg_5d_return_pct": 0.35,
+          "avg_10d_return_pct": 0.46,
+          "avg_20d_return_pct": 0.65,
+          "avg_max_drawdown_pct": -2.5,
+          "avg_max_runup_pct": 2.57,
+          "avg_score": 33.16
+        },
+        "Stalk / Watchlist": {
+          "signal_count": 153,
+          "success_rate": 79.1,
+          "support_hold_rate": 87.6,
+          "avg_5d_return_pct": 0.17,
+          "avg_10d_return_pct": 0.26,
+          "avg_20d_return_pct": 0.92,
+          "avg_max_drawdown_pct": -2.52,
           "avg_max_runup_pct": 2.6,
-          "avg_score": 28.75
+          "avg_score": 30.31
         }
       },
-      "candidate_like": null
+      "candidate_like": {
+        "signal_count": 231,
+        "success_rate": 67.5,
+        "avg_20d_return_pct": 0.62,
+        "avg_max_drawdown_pct": -2.57
+      }
     },
     {
       "symbol": "CWVX",
-      "error": "Not enough history for backtesting after indicator warm-up. Got 211 rows."
+      "error": "Not enough history for backtesting after indicator warm-up. Got 212 rows."
     },
     {
       "symbol": "IREN",
-      "signal_count": 511,
+      "signal_count": 512,
       "labels": {
         "Breakdown Risk": {
-          "signal_count": 152,
-          "success_rate": 28.3,
-          "support_hold_rate": 51.3,
-          "avg_5d_return_pct": 2.95,
-          "avg_10d_return_pct": 7.04,
-          "avg_20d_return_pct": 17.02,
-          "avg_max_drawdown_pct": -14.85,
-          "avg_max_runup_pct": 32.41,
-          "avg_score": -32.57
+          "signal_count": 146,
+          "success_rate": 28.1,
+          "support_hold_rate": 52.1,
+          "avg_5d_return_pct": 2.65,
+          "avg_10d_return_pct": 6.74,
+          "avg_20d_return_pct": 16.66,
+          "avg_max_drawdown_pct": -14.68,
+          "avg_max_runup_pct": 31.7,
+          "avg_score": -31.53
         },
         "Downtrend Risk": {
-          "signal_count": 95,
-          "success_rate": 24.2,
-          "support_hold_rate": 53.7,
-          "avg_5d_return_pct": 1.51,
-          "avg_10d_return_pct": 0.86,
-          "avg_20d_return_pct": 4.38,
-          "avg_max_drawdown_pct": -17.57,
-          "avg_max_runup_pct": 24.69,
-          "avg_score": -24.58
+          "signal_count": 97,
+          "success_rate": 25.8,
+          "support_hold_rate": 52.6,
+          "avg_5d_return_pct": 1.91,
+          "avg_10d_return_pct": 1.6,
+          "avg_20d_return_pct": 5.42,
+          "avg_max_drawdown_pct": -17.79,
+          "avg_max_runup_pct": 25.98,
+          "avg_score": -22.7
         },
         "Neutral / Wait": {
-          "signal_count": 264,
-          "success_rate": 28.0,
-          "support_hold_rate": 72.3,
-          "avg_5d_return_pct": 3.98,
-          "avg_10d_return_pct": 8.77,
-          "avg_20d_return_pct": 17.95,
-          "avg_max_drawdown_pct": -18.0,
-          "avg_max_runup_pct": 43.66,
-          "avg_score": 16.08
+          "signal_count": 228,
+          "success_rate": 25.4,
+          "support_hold_rate": 68.4,
+          "avg_5d_return_pct": 3.35,
+          "avg_10d_return_pct": 6.79,
+          "avg_20d_return_pct": 13.68,
+          "avg_max_drawdown_pct": -19.58,
+          "avg_max_runup_pct": 40.73,
+          "avg_score": 17.19
+        },
+        "Put Sell Candidate": {
+          "signal_count": 1,
+          "success_rate": 0.0,
+          "support_hold_rate": 0.0,
+          "avg_5d_return_pct": 9.23,
+          "avg_10d_return_pct": 3.92,
+          "avg_20d_return_pct": 78.37,
+          "avg_max_drawdown_pct": -6.47,
+          "avg_max_runup_pct": 96.61,
+          "avg_score": 24.0
+        },
+        "Stalk / Watchlist": {
+          "signal_count": 40,
+          "success_rate": 40.0,
+          "support_hold_rate": 95.0,
+          "avg_5d_return_pct": 7.38,
+          "avg_10d_return_pct": 19.07,
+          "avg_20d_return_pct": 39.89,
+          "avg_max_drawdown_pct": -8.79,
+          "avg_max_runup_pct": 57.5,
+          "avg_score": 21.12
         }
       },
-      "candidate_like": null
+      "candidate_like": {
+        "signal_count": 1,
+        "success_rate": 0.0,
+        "avg_20d_return_pct": 78.37,
+        "avg_max_drawdown_pct": -6.47
+      }
     }
   ],
   "methodology": {

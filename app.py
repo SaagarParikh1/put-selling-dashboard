@@ -80,6 +80,8 @@ st.markdown("""
         color: var(--text-main);
     }
 
+    .desk-header,
+    .workflow-strip,
     .hero-shell,
     .run-panel,
     .section-card,
@@ -110,6 +112,130 @@ st.markdown("""
         position: relative;
         overflow: hidden;
         margin-bottom: 0.65rem;
+    }
+
+    .desk-header {
+        border-radius: 26px;
+        padding: 1.15rem 1.25rem;
+        margin-bottom: 0.75rem;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .desk-header::before {
+        content: "";
+        position: absolute;
+        inset: 0;
+        background:
+            linear-gradient(90deg, rgba(45, 212, 191, 0.12), transparent 42%),
+            radial-gradient(circle at right top, rgba(251, 146, 60, 0.11), transparent 30%);
+        pointer-events: none;
+    }
+
+    .desk-header-top {
+        position: relative;
+        display: flex;
+        align-items: flex-start;
+        justify-content: space-between;
+        gap: 1rem;
+        flex-wrap: wrap;
+    }
+
+    .desk-title {
+        font-family: "Space Grotesk", sans-serif;
+        font-size: 2.28rem;
+        line-height: 1.02;
+        font-weight: 700;
+        letter-spacing: -0.045em;
+        color: #f7fbf8;
+        margin-bottom: 0.34rem;
+    }
+
+    .desk-subtitle {
+        max-width: 54rem;
+        color: #b8cbc6;
+        font-size: 0.96rem;
+        line-height: 1.55;
+    }
+
+    .desk-status-pill {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 999px;
+        padding: 0.55rem 0.82rem;
+        font-size: 0.78rem;
+        font-weight: 900;
+        letter-spacing: 0.06em;
+        text-transform: uppercase;
+        border: 1px solid rgba(129, 230, 217, 0.18);
+        background: rgba(8, 19, 26, 0.62);
+        white-space: nowrap;
+    }
+
+    .desk-meta-row {
+        position: relative;
+        display: flex;
+        gap: 0.45rem;
+        flex-wrap: wrap;
+        margin-top: 0.9rem;
+    }
+
+    .desk-meta-item {
+        border-radius: 999px;
+        border: 1px solid rgba(129, 230, 217, 0.12);
+        background: rgba(8, 19, 26, 0.48);
+        color: #dcebe6;
+        padding: 0.42rem 0.68rem;
+        font-size: 0.82rem;
+        font-weight: 800;
+    }
+
+    .workflow-strip {
+        border-radius: 22px;
+        padding: 0.78rem;
+        margin-bottom: 0.85rem;
+    }
+
+    .workflow-grid {
+        display: grid;
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+        gap: 0.55rem;
+    }
+
+    .workflow-step {
+        border-radius: 16px;
+        padding: 0.72rem 0.78rem;
+        background: rgba(7, 19, 26, 0.42);
+        border: 1px solid rgba(129, 230, 217, 0.09);
+        min-height: 94px;
+    }
+
+    .workflow-step-active {
+        border-color: rgba(45, 212, 191, 0.32);
+        background: linear-gradient(135deg, rgba(45, 212, 191, 0.13), rgba(96, 165, 250, 0.08));
+    }
+
+    .workflow-step-number {
+        color: #81e6d9;
+        font-size: 0.72rem;
+        font-weight: 900;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        margin-bottom: 0.25rem;
+    }
+
+    .workflow-step-title {
+        color: var(--text-main);
+        font-size: 0.92rem;
+        font-weight: 900;
+        margin-bottom: 0.18rem;
+    }
+
+    .workflow-step-copy {
+        color: #93aba5;
+        font-size: 0.8rem;
+        line-height: 1.42;
     }
 
     .hero-shell::before {
@@ -407,6 +533,27 @@ st.markdown("""
         margin-bottom: 0.65rem;
     }
 
+    .empty-queue {
+        border-radius: 18px;
+        padding: 1rem;
+        margin-bottom: 1rem;
+        border: 1px dashed rgba(250, 204, 21, 0.28);
+        background: rgba(250, 204, 21, 0.065);
+    }
+
+    .empty-queue-title {
+        color: #fde68a;
+        font-size: 0.98rem;
+        font-weight: 900;
+        margin-bottom: 0.2rem;
+    }
+
+    .empty-queue-copy {
+        color: #c9d8d3;
+        font-size: 0.88rem;
+        line-height: 1.55;
+    }
+
     div[data-testid="stMetric"] {
         border-radius: 18px;
         padding: 0.85rem 0.95rem;
@@ -649,6 +796,8 @@ st.markdown("""
         }
 
         .hero-shell,
+        .desk-header,
+        .workflow-strip,
         .run-panel,
         .section-card,
         .watchlist-card,
@@ -664,7 +813,8 @@ st.markdown("""
         }
 
         .operator-grid,
-        .signal-count-grid {
+        .signal-count-grid,
+        .workflow-grid {
             grid-template-columns: 1fr;
         }
     }
@@ -723,6 +873,27 @@ def render_signal_count_grid(counts: dict) -> str:
             "</div>"
         )
     return "<div class='signal-count-grid'>" + "".join(tiles) + "</div>"
+
+
+def render_workflow_strip(analysis_ready: bool) -> str:
+    steps = [
+        ("01", "Run Scan", "Refresh prices, scoring, and the learning profile."),
+        ("02", "Check Queue", "Start with Ready Now, then stalk names, then avoid names."),
+        ("03", "Deep Dive", "Confirm support, bounce quality, and downside risk."),
+        ("04", "Decide", "Sell only when timing and assignment comfort line up."),
+    ]
+    active_idx = 1 if analysis_ready else 0
+    step_html = []
+    for idx, (number, title, copy) in enumerate(steps):
+        active_class = " workflow-step-active" if idx == active_idx else ""
+        step_html.append(
+            f"<div class='workflow-step{active_class}'>"
+            f"<div class='workflow-step-number'>{number}</div>"
+            f"<div class='workflow-step-title'>{title}</div>"
+            f"<div class='workflow-step-copy'>{copy}</div>"
+            "</div>"
+        )
+    return "<div class='workflow-strip'><div class='workflow-grid'>" + "".join(step_html) + "</div></div>"
 
 
 LABEL_PRIORITY = {
@@ -2068,6 +2239,9 @@ with st.sidebar:
         unsafe_allow_html=True,
     )
 
+    sidebar_run_analysis = st.button("Run Analysis", use_container_width=True, type="primary")
+    st.caption("Refresh rankings, backtest learning, and deep-dive data.")
+
     filter_panel = st.container(border=True)
     with filter_panel:
         st.markdown("### Signal Focus")
@@ -2171,9 +2345,6 @@ with st.sidebar:
             unsafe_allow_html=True
         )
 
-    sidebar_run_analysis = st.button("Run Analysis", use_container_width=True, type="primary")
-    st.caption("Refresh the ranking, backtest summary, and deep-dive data.")
-
 if sidebar_run_analysis:
     run_full_analysis()
 
@@ -2185,42 +2356,26 @@ analysis_status_note = (
     else "Run analysis from the sidebar to populate the trade queue, ranking, and deep dive."
 )
 
-hero_left, hero_right = st.columns([4.4, 1.45], vertical_alignment="center", gap="large")
-
-with hero_left:
-    st.markdown(
-        f"""
-        <div class='hero-shell'>
-            <div class='hero-kicker'>Cash-Secured Put Workflow</div>
-            <div class='hero-title'>Put Selling Desk</div>
-            <div class='hero-subtitle'>A cleaner decision surface for spotting stocks near support, checking bounce quality, and separating live put-sale setups from names that need patience.</div>
-            <div>
-                <span class='summary-chip'>Watchlist: {len(st.session_state.watchlist)} ticker(s)</span>
-                <span class='summary-chip'>Filter: {signal_filter}</span>
-                <span class='summary-chip'>Default View: 3M</span>
-            </div>
-        </div>
-        """,
-        unsafe_allow_html=True
-    )
-
-with hero_right:
-    st.markdown(
-        f"""
-        <div class='run-panel'>
-            <div class='section-eyebrow'>Workspace Status</div>
-            <div class='run-panel-title'>Session State</div>
-            <div class='run-panel-value' style='color:{analysis_status_color};'>{analysis_status_text}</div>
-            <div class='run-panel-copy'>{analysis_status_note}</div>
-        </div>
-        """,
-        unsafe_allow_html=True,
-    )
-
-st.markdown(
-    "<div class='hero-note'>Workflow: check the trade queue first, confirm support in the deep dive, then decide whether the premium is worth the assignment risk.</div>",
-    unsafe_allow_html=True
+desk_header_html = (
+    "<div class='desk-header'>"
+    "<div class='desk-header-top'>"
+    "<div>"
+    "<div class='hero-kicker'>Cash-Secured Put Workflow</div>"
+    "<div class='desk-title'>Put Selling Desk</div>"
+    "<div class='desk-subtitle'>Scan the watchlist, find names near support, and decide whether the setup is worth selling a put or better left alone.</div>"
+    "</div>"
+    f"<div class='desk-status-pill' style='color:{analysis_status_color};'>{analysis_status_text}</div>"
+    "</div>"
+    "<div class='desk-meta-row'>"
+    f"<span class='desk-meta-item'>Watchlist: {len(st.session_state.watchlist)} ticker(s)</span>"
+    f"<span class='desk-meta-item'>Filter: {signal_filter}</span>"
+    "<span class='desk-meta-item'>Chart Default: 3M</span>"
+    f"<span class='desk-meta-item'>{analysis_status_note}</span>"
+    "</div>"
+    "</div>"
 )
+st.markdown(desk_header_html, unsafe_allow_html=True)
+st.markdown(render_workflow_strip(st.session_state.analysis_ready), unsafe_allow_html=True)
 
 if st.session_state.watchlist:
     st.markdown(
@@ -2377,7 +2532,10 @@ if st.session_state.analysis_ready and st.session_state.analysis_df is not None:
             )
         else:
             st.markdown(
-                "<div class='soft-danger-text'>No stocks currently qualify as trade-ready put setups. Use the stalk list below instead of forcing an entry.</div>",
+                "<div class='empty-queue'>"
+                "<div class='empty-queue-title'>No trade-ready put setups right now</div>"
+                "<div class='empty-queue-copy'>That is a useful signal, not a failure. Review the stalk list for names that may become attractive after a cleaner pullback or bounce confirmation.</div>"
+                "</div>",
                 unsafe_allow_html=True
             )
 
