@@ -31,7 +31,8 @@ from src.watchlist_manager import (
 st.set_page_config(
     page_title="Quantitative Put Selling Dashboard",
     page_icon="📈",
-    layout="wide"
+    layout="wide",
+    initial_sidebar_state="collapsed"
 )
 
 st.markdown("""
@@ -809,11 +810,50 @@ st.markdown("""
 
     @media (max-width: 900px) {
         .block-container {
-            padding-top: 0.95rem;
+            padding: 0.75rem 0.72rem 2.2rem 0.72rem;
         }
 
-        .hero-title {
-            font-size: 2.25rem;
+        div[data-testid="stVerticalBlock"] {
+            gap: 0.75rem;
+        }
+
+        div[data-testid="stHorizontalBlock"] {
+            gap: 0.85rem;
+        }
+
+        .desk-title {
+            font-size: 1.82rem;
+            line-height: 1.05;
+            letter-spacing: -0.035em;
+        }
+
+        .desk-subtitle {
+            font-size: 0.88rem;
+            line-height: 1.48;
+        }
+
+        .desk-header {
+            padding: 1rem;
+            margin-bottom: 0.85rem;
+        }
+
+        .desk-status-pill {
+            width: 100%;
+            justify-content: flex-start;
+            padding: 0.52rem 0.7rem;
+            white-space: normal;
+        }
+
+        .desk-meta-row {
+            gap: 0.35rem;
+            margin-top: 0.72rem;
+        }
+
+        .desk-meta-item {
+            width: 100%;
+            border-radius: 14px;
+            padding: 0.48rem 0.62rem;
+            font-size: 0.78rem;
         }
 
         .hero-shell,
@@ -833,10 +873,125 @@ st.markdown("""
             border-radius: 20px;
         }
 
+        .workflow-strip,
+        .ticker-rail,
+        .operator-board {
+            padding: 0.78rem;
+            margin-bottom: 0.9rem;
+        }
+
         .operator-grid,
-        .signal-count-grid,
         .workflow-grid {
             grid-template-columns: 1fr;
+        }
+
+        .signal-count-grid {
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 0.52rem;
+        }
+
+        .signal-count-tile {
+            min-height: 76px;
+            padding: 0.62rem;
+        }
+
+        .signal-count-label {
+            font-size: 0.66rem;
+        }
+
+        .signal-count-value {
+            font-size: 1.34rem;
+        }
+
+        .workflow-step {
+            min-height: auto;
+            padding: 0.72rem;
+        }
+
+        .pill,
+        .summary-chip {
+            width: 100%;
+            justify-content: center;
+            margin-right: 0;
+        }
+
+        .section-title {
+            font-size: 1.12rem;
+        }
+
+        .section-subtitle,
+        .analysis-note,
+        .table-context {
+            font-size: 0.84rem;
+            line-height: 1.5;
+        }
+
+        div[data-testid="stTabs"] [data-baseweb="tab-list"] {
+            overflow-x: auto;
+            flex-wrap: nowrap;
+            scrollbar-width: none;
+        }
+
+        div[data-testid="stTabs"] button {
+            min-width: max-content;
+            padding: 0.5rem 0.72rem !important;
+            font-size: 0.82rem !important;
+        }
+
+        div[data-testid="stDataFrame"] {
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
+        }
+
+        section[data-testid="stSidebar"] .block-container {
+            padding: 0.85rem 0.8rem 1.2rem 0.8rem;
+        }
+
+        section[data-testid="stSidebar"] div[data-testid="stButton"] button[kind="primary"],
+        div[data-testid="stButton"] button[kind="primary"] {
+            min-height: 3.35rem !important;
+            font-size: 1rem !important;
+        }
+    }
+
+    @media (max-width: 520px) {
+        .block-container {
+            padding-left: 0.55rem;
+            padding-right: 0.55rem;
+        }
+
+        .desk-title {
+            font-size: 1.58rem;
+        }
+
+        .desk-header,
+        .workflow-strip,
+        .ticker-rail,
+        .operator-board,
+        .market-cardlet,
+        .priority-card,
+        .empty-state,
+        .guide-panel,
+        .reason-group-card,
+        .decision-card {
+            border-radius: 17px;
+        }
+
+        .signal-count-grid {
+            grid-template-columns: 1fr 1fr;
+        }
+
+        .market-cardlet,
+        .priority-card {
+            padding: 0.82rem;
+        }
+
+        .market-regime-line {
+            font-size: 1.12rem;
+        }
+
+        .context-chip-row {
+            gap: 0.28rem;
         }
     }
 </style>
@@ -844,6 +999,7 @@ st.markdown("""
 
 PLOT_CONFIG = {
     "scrollZoom": True,
+    "responsive": True,
     "displaylogo": False,
     "modeBarButtonsToAdd": ["zoomIn2d", "zoomOut2d", "autoScale2d", "resetScale2d"],
 }
@@ -1865,7 +2021,7 @@ def render_deep_dive_section(selected_symbol, stock_df, stock_signal, trade_leve
         price_fig.update_layout(
             title=f"{selected_symbol} Price Action",
             template="plotly_dark",
-            height=560,
+            height=500,
             dragmode="zoom",
             hovermode="x unified",
             xaxis_title="Time",
@@ -1897,7 +2053,7 @@ def render_deep_dive_section(selected_symbol, stock_df, stock_signal, trade_leve
             volume_fig.update_layout(
                 title="Volume",
                 template="plotly_dark",
-                height=280,
+                height=245,
                 dragmode="zoom",
                 hovermode="x unified",
                 xaxis_title="Time",
@@ -1917,7 +2073,7 @@ def render_deep_dive_section(selected_symbol, stock_df, stock_signal, trade_leve
             rsi_fig.update_layout(
                 title="RSI Pullback Zone",
                 template="plotly_dark",
-                height=300,
+                height=260,
                 dragmode="zoom",
                 hovermode="x unified",
                 xaxis_title="Time",
@@ -1937,7 +2093,7 @@ def render_deep_dive_section(selected_symbol, stock_df, stock_signal, trade_leve
             adx_fig.update_layout(
                 title="Trend Strength (ADX / DI)",
                 template="plotly_dark",
-                height=320,
+                height=270,
                 dragmode="zoom",
                 hovermode="x unified",
                 xaxis_title="Time",
@@ -1957,7 +2113,7 @@ def render_deep_dive_section(selected_symbol, stock_df, stock_signal, trade_leve
             macd_fig.update_layout(
                 title="MACD",
                 template="plotly_dark",
-                height=300,
+                height=260,
                 dragmode="zoom",
                 hovermode="x unified",
                 xaxis_title="Time",
@@ -1986,7 +2142,7 @@ def render_deep_dive_section(selected_symbol, stock_df, stock_signal, trade_leve
             breakdown_fig.update_layout(
                 title="Signal Breakdown",
                 template="plotly_dark",
-                height=300,
+                height=260,
                 dragmode="zoom",
                 hovermode="x unified",
                 xaxis_title="Component",
@@ -2006,7 +2162,7 @@ def render_deep_dive_section(selected_symbol, stock_df, stock_signal, trade_leve
             flow_fig.update_layout(
                 title="Chaikin Money Flow",
                 template="plotly_dark",
-                height=320,
+                height=270,
                 dragmode="zoom",
                 hovermode="x unified",
                 xaxis_title="Time",
